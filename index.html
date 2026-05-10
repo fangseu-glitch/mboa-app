@@ -270,7 +270,46 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <script>
 
 
+// Global function aliases - must be defined before HTML renders
+window.toggleSidebar = function(){ togSB(); };
+window.toggleFaq = function(el) {
+  var item = el.closest('.faq-item');
+  if (!item) return;
+  var isOpen = item.classList.contains('active');
+  document.querySelectorAll('.faq-item').forEach(function(i){ i.classList.remove('active'); });
+  if (!isOpen) item.classList.add('active');
+};
 var SB_URL="https://nkfzmzbteqrdbyjtgwsh.supabase.co";
+
+// Aliases pour compatibilite HTML
+window.goto = G;
+window.G = G;
+var toggleSidebar = togSB;
+window.toggleSidebar = togSB;
+var closeSidebar = closeSB;
+var swTab = swT;
+var openModalMembre = openMM;
+var switchAuthTab = function(t){ aTab(t==='login'?0:1); };
+var authTab = switchAuthTab;
+var addCotisation = addCot;
+var addAdhesion = addAdh;
+var addRetard = addRet;
+var addAmende = addAm;
+var addSortieCaisse = addFC;
+var addVirement = addVir;
+var addPretInteret = addPI;
+var previewDon = prvDon;
+var previewPret = prvPret;
+var previewPretInteret = prvPI;
+var saveReunion = saveReun;
+var loadConfPage = loadConf;
+var forgotPwd = dofPwd;
+var doForgotPassword = dofPwd;
+var resetSetup = resetSU;
+var saveSetup = doSetup;
+function closeModal(id){ closeMO(id); }
+function openModal(id){ openMO(id); }
+
 var SUPERADMIN_EMAIL="superadmin@mboa.app";
 var IS_SUPERADMIN=false;
 var SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5rZnptemJ0ZXFyZGJ5anRnd3NoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNTcwNzEsImV4cCI6MjA5MzczMzA3MX0.L_kInjCx4gpTpe1LeiL8guEDMEjAwaBkj5oIiH5Hpkw";
@@ -1849,18 +1888,7 @@ showSS=function(n){
   <p>© 2026 Mboa · Tous droits réservés</p>
 </footer>
 
-<script>
-function toggleFaq(el) {
-  const item = el.closest('.faq-item');
-  item.classList.toggle('open');
-}
 
-// Scroll animations
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
-}, {threshold:0.1});
-document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-</script>
 
 </div>
 
@@ -1882,7 +1910,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
     </div>
     <div class="form-group"><label>Project URL</label><input type="url" id="s-url" placeholder="https://abcxyz.supabase.co"></div>
     <div class="form-group"><label>Clé anon public</label><input type="text" id="s-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></div>
-    <button class="btn btn-primary" onclick="saveSetup()">Connecter →</button>
+    <button class="btn btn-primary" onclick="doSetup()">Connecter →</button>
     <p style="font-size:12px;color:var(--text3);text-align:center;margin-top:12px">Ces informations sont stockées dans votre navigateur uniquement.</p>
   </div>
 </div>
@@ -1893,8 +1921,8 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
     <div class="logo">Mboa</div>
     <p class="tagline">Gestion d'association professionnelle</p>
     <div class="auth-tabs">
-      <div class="auth-tab active" onclick="authTab('login')">Connexion</div>
-      <div class="auth-tab" onclick="authTab('register')">Créer un compte</div>
+      <div class="auth-tab active" onclick="aTab('login')">Connexion</div>
+      <div class="auth-tab" onclick="aTab('register')">Créer un compte</div>
     </div>
     <div id="auth-msg" class="hidden"></div>
 
@@ -1902,7 +1930,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
       <div class="form-group"><label>Email</label><input type="email" id="li-email" placeholder="vous@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <div class="form-group"><label>Mot de passe</label><input type="password" id="li-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button class="btn btn-primary" id="btn-li" onclick="doLogin()">Se connecter</button>
-      <div style="text-align:center;margin-top:12px"><a href="#" onclick="forgotPwd()" style="font-size:13px;color:var(--text3)">Mot de passe oublié ?</a></div>
+      <div style="text-align:center;margin-top:12px"><a href="#" onclick="dofPwd()" style="font-size:13px;color:var(--text3)">Mot de passe oublié ?</a></div>
     </div>
 
     <div id="f-register" class="hidden">
@@ -1923,32 +1951,32 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
     <div class="sb-user"><div class="sb-avatar" id="sb-av">?</div><div><div style="font-size:13px;font-weight:500" id="sb-user">—</div><div style="font-size:11px;color:var(--text3)" id="sb-role">Admin</div></div></div>
     <div class="nav-section">
       <div class="nav-label">Principal</div>
-      <div class="nav-item active" onclick="goto('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Tableau de bord</div>
-      <div class="nav-item" onclick="goto('membres')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Membres</div>
-      <div class="nav-item" onclick="goto('reunions')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Réunions</div>
+      <div class="nav-item active" onclick="G('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Tableau de bord</div>
+      <div class="nav-item" onclick="G('membres')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Membres</div>
+      <div class="nav-item" onclick="G('reunions')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Réunions</div>
     </div>
     <div class="nav-section">
       <div class="nav-label">Finances</div>
-      <div class="nav-item" onclick="goto('cotisations')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Cotisations</div>
-      <div class="nav-item" onclick="goto('adhesion')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg>Adhésion</div>
-      <div class="nav-item" onclick="goto('retards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Retards</div>
-      <div class="nav-item" onclick="goto('amendes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>Amendes</div>
+      <div class="nav-item" onclick="G('cotisations')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Cotisations</div>
+      <div class="nav-item" onclick="G('adhesion')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg>Adhésion</div>
+      <div class="nav-item" onclick="G('retards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Retards</div>
+      <div class="nav-item" onclick="G('amendes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>Amendes</div>
     </div>
     <div class="nav-section">
       <div class="nav-label">Fonds</div>
-      <div class="nav-item" onclick="goto('dons')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Dons</div>
-      <div class="nav-item" onclick="goto('prets')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Prêts</div>
-      <div class="nav-item" onclick="goto('fond-caisse')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4"/><path d="M2 13v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6"/><circle cx="12" cy="10" r="2"/></svg>Fond Caisse</div>
-      <div class="nav-item" onclick="goto('fond-cotisation')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Fond Cotisation</div>
+      <div class="nav-item" onclick="G('dons')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Dons</div>
+      <div class="nav-item" onclick="G('prets')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Prêts</div>
+      <div class="nav-item" onclick="G('fond-caisse')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4"/><path d="M2 13v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6"/><circle cx="12" cy="10" r="2"/></svg>Fond Caisse</div>
+      <div class="nav-item" onclick="G('fond-cotisation')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Fond Cotisation</div>
     </div>
     <div class="nav-section">
       <div class="nav-label">Admin</div>
-      <div class="nav-item" onclick="goto('comptabilite')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Comptabilité</div>
-      <div class="nav-item" onclick="goto('alertes')" id="nav-alertes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Alertes <span id="badge-alertes" style="display:none;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px">0</span></div>
-      <div class="nav-item" onclick="goto('mon-compte')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg>Mon Compte</div>
-      <div class="nav-item" onclick="goto('pret-interet')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/><circle cx="19" cy="5" r="3"/></svg>Prêts + Intérêts</div>
-      <div class="nav-item" onclick="goto('configuration')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>Configuration</div>
-      <div class="nav-item" id="nav-superadmin" style="display:none;border-top:1px solid var(--border);margin-top:8px" onclick="goto('superadmin')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Super Admin</div>
+      <div class="nav-item" onclick="G('comptabilite')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Comptabilité</div>
+      <div class="nav-item" onclick="G('alertes')" id="nav-alertes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Alertes <span id="badge-alertes" style="display:none;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px">0</span></div>
+      <div class="nav-item" onclick="G('mon-compte')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg>Mon Compte</div>
+      <div class="nav-item" onclick="G('pret-interet')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/><circle cx="19" cy="5" r="3"/></svg>Prêts + Intérêts</div>
+      <div class="nav-item" onclick="G('configuration')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>Configuration</div>
+      <div class="nav-item" id="nav-superadmin" style="display:none;border-top:1px solid var(--border);margin-top:8px" onclick="G('superadmin')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Super Admin</div>
     </div>
     <div class="sb-footer">
       <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Mboa · <span id="sb-count">0</span> membre(s)</div>
@@ -1956,12 +1984,12 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
     </div>
   </nav>
 
-  <div id="overlay" onclick="closeSidebar()"></div>
+  <div id="overlay" onclick="closeSB()"></div>
 
   <div id="main">
     <div class="topbar">
       <div style="display:flex;align-items:center;gap:10px">
-        <button id="hamburger" onclick="toggleSidebar()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <button id="hamburger" onclick="togSB()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
         <span class="topbar-title" id="page-title">Tableau de bord</span>
       </div>
       <span id="topbar-date" style="font-size:12px;color:var(--text3)"></span>
@@ -1985,7 +2013,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
     <!-- MEMBRES -->
     <div class="page" id="page-membres">
       <div class="card">
-        <div class="card-title">Membres <button class="btn btn-primary btn-sm" style="width:auto" onclick="openModalMembre()">+ Ajouter</button></div>
+        <div class="card-title">Membres <button class="btn btn-primary btn-sm" style="width:auto" onclick="openMM()">+ Ajouter</button></div>
         <div class="table-wrap"><table>
           <thead><tr><th>Membre</th><th>Téléphone</th><th>Email</th><th>Statut</th><th>Fonds adhésion</th><th>Actions</th></tr></thead>
           <tbody id="m-tbody"><tr><td colspan="6"><div class="empty">Chargement…</div></td></tr></tbody>
@@ -1995,7 +2023,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
     <!-- COTISATIONS -->
     <div class="page" id="page-cotisations">
-      <div class="tabs"><div class="tab active" onclick="swTab(this,'tc-l')">Liste</div><div class="tab" onclick="swTab(this,'tc-n')">Nouvelle</div></div>
+      <div class="tabs"><div class="tab active" onclick="swT(this,'tc-l')">Liste</div><div class="tab" onclick="swT(this,'tc-n')">Nouvelle</div></div>
       <div id="tc-l">
         <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
           <select id="cot-fm" onchange="renderCots()" style="width:200px"><option value="">Tous les membres</option></select>
@@ -2022,7 +2050,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
     <!-- ADHESION -->
     <div class="page" id="page-adhesion">
-      <div class="tabs"><div class="tab active" onclick="swTab(this,'ta-f')">Fonds</div><div class="tab" onclick="swTab(this,'ta-l')">Paiements</div><div class="tab" onclick="swTab(this,'ta-n')">Nouveau</div></div>
+      <div class="tabs"><div class="tab active" onclick="swT(this,'ta-f')">Fonds</div><div class="tab" onclick="swT(this,'ta-l')">Paiements</div><div class="tab" onclick="swT(this,'ta-n')">Nouveau</div></div>
       <div id="ta-f"><div class="card" style="padding:0"><div class="table-wrap"><table>
         <thead><tr><th>Membre</th><th>Fonds adhésion (€)</th></tr></thead><tbody id="adh-fonds-tb"></tbody>
       </table></div></div></div>
@@ -2043,7 +2071,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
     <!-- RETARDS -->
     <div class="page" id="page-retards">
-      <div class="tabs"><div class="tab active" onclick="swTab(this,'tr-l')">Liste</div><div class="tab" onclick="swTab(this,'tr-n')">Nouveau</div></div>
+      <div class="tabs"><div class="tab active" onclick="swT(this,'tr-l')">Liste</div><div class="tab" onclick="swT(this,'tr-n')">Nouveau</div></div>
       <div id="tr-l"><div class="card" style="padding:0"><div class="table-wrap"><table>
         <thead><tr><th>Membre</th><th>Motif</th><th>Montant</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="ret-tbody"></tbody>
       </table></div></div></div>
@@ -2060,7 +2088,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
     <!-- AMENDES -->
     <div class="page" id="page-amendes">
-      <div class="tabs"><div class="tab active" onclick="swTab(this,'tam-l')">Liste</div><div class="tab" onclick="swTab(this,'tam-n')">Nouvelle</div></div>
+      <div class="tabs"><div class="tab active" onclick="swT(this,'tam-l')">Liste</div><div class="tab" onclick="swT(this,'tam-n')">Nouvelle</div></div>
       <div id="tam-l"><div class="card" style="padding:0"><div class="table-wrap"><table>
         <thead><tr><th>Membre</th><th>Motif</th><th>Montant</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="am-tbody"></tbody>
       </table></div></div></div>
@@ -2078,7 +2106,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
     <!-- DONS -->
     <div class="page" id="page-dons">
       <div class="alert alert-info">❤ Un membre reçoit un don prélevé sur le fonds adhésion des autres membres. Délai remboursement : selon configuration (défaut 3 mois).</div>
-      <div class="tabs"><div class="tab active" onclick="swTab(this,'td-l')">Dons accordés</div><div class="tab" onclick="swTab(this,'td-r')">Remboursements</div><div class="tab" onclick="swTab(this,'td-n')">Nouveau don</div></div>
+      <div class="tabs"><div class="tab active" onclick="swT(this,'td-l')">Dons accordés</div><div class="tab" onclick="swT(this,'td-r')">Remboursements</div><div class="tab" onclick="swT(this,'td-n')">Nouveau don</div></div>
       <div id="td-l"><div class="card" style="padding:0"><div class="table-wrap"><table>
         <thead><tr><th>Bénéficiaire</th><th>Montant</th><th>Date</th><th>Motif</th><th>Remboursements</th><th>Actions</th></tr></thead>
         <tbody id="don-tbody"></tbody>
@@ -2102,7 +2130,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
     <!-- PRETS -->
     <div class="page" id="page-prets">
       <div class="alert alert-info">💸 Le prêt est réparti sur tous les membres actifs. Chacun rembourse sa quote-part dans le délai configuré.</div>
-      <div class="tabs"><div class="tab active" onclick="swTab(this,'tp-l')">Prêts accordés</div><div class="tab" onclick="swTab(this,'tp-r')">Remboursements</div><div class="tab" onclick="swTab(this,'tp-n')">Nouveau prêt</div></div>
+      <div class="tabs"><div class="tab active" onclick="swT(this,'tp-l')">Prêts accordés</div><div class="tab" onclick="swT(this,'tp-r')">Remboursements</div><div class="tab" onclick="swT(this,'tp-n')">Nouveau prêt</div></div>
       <div id="tp-l"><div class="card" style="padding:0"><div class="table-wrap"><table>
         <thead><tr><th>Bénéficiaire</th><th>Montant</th><th>Date</th><th>Motif</th><th>Remboursements</th><th>Actions</th></tr></thead>
         <tbody id="pret-tbody"></tbody>
@@ -2127,7 +2155,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
     <div class="page" id="page-fond-caisse">
       <div class="alert alert-info">🏦 Alimenté par les retards et amendes payés. Les sorties manuelles débitent ce fond.</div>
       <div class="stat-grid" id="caisse-stats"></div>
-      <div class="tabs"><div class="tab active" onclick="swTab(this,'tfc-l')">Journal</div><div class="tab" onclick="swTab(this,'tfc-n')">Nouvelle sortie</div></div>
+      <div class="tabs"><div class="tab active" onclick="swT(this,'tfc-l')">Journal</div><div class="tab" onclick="swT(this,'tfc-n')">Nouvelle sortie</div></div>
       <div id="tfc-l"><div class="card" style="padding:0"><div class="table-wrap"><table>
         <thead><tr><th>Date</th><th>Type</th><th>Membre</th><th>Description</th><th>Entrée (€)</th><th>Sortie (€)</th><th>Solde (€)</th></tr></thead>
         <tbody id="caisse-tbody"></tbody>
@@ -2138,7 +2166,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
           <div class="form-group"><label>Montant (€)</label><input type="number" id="caisse-mt" placeholder="0" min="0"></div>
           <div class="form-group"><label>Date</label><input type="date" id="caisse-dt"></div>
         </div>
-        <button onclick="addSortieCaisse()" style="margin-top:14px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Enregistrer la sortie</button>
+        <button onclick="addFC()" style="margin-top:14px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Enregistrer la sortie</button>
       </div></div>
     </div>
 
@@ -2146,7 +2174,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
     <div class="page" id="page-fond-cotisation">
       <div class="alert alert-info">💳 Alimenté par les cotisations payées. Les virements vers membres débitent ce fond.</div>
       <div class="stat-grid" id="fondcot-stats"></div>
-      <div class="tabs"><div class="tab active" onclick="swTab(this,'tfcot-l')">Journal</div><div class="tab" onclick="swTab(this,'tfcot-n')">Virement vers membre</div></div>
+      <div class="tabs"><div class="tab active" onclick="swT(this,'tfcot-l')">Journal</div><div class="tab" onclick="swT(this,'tfcot-n')">Virement vers membre</div></div>
       <div id="tfcot-l"><div class="card" style="padding:0"><div class="table-wrap"><table>
         <thead><tr><th>Date</th><th>Type</th><th>Membre</th><th>Description</th><th>Entrée (€)</th><th>Sortie (€)</th><th>Solde (€)</th></tr></thead>
         <tbody id="fondcot-tbody"></tbody>
@@ -2159,14 +2187,14 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
           <div class="form-group"><label>Motif</label><input type="text" id="vir-mo" placeholder="Ex: aide exceptionnelle..."></div>
         </div>
         <div id="vir-solde" style="margin-top:10px"></div>
-        <button onclick="addVirement()" style="margin-top:14px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Effectuer le virement</button>
+        <button onclick="addVir()" style="margin-top:14px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Effectuer le virement</button>
       </div></div>
     </div>
 
     <!-- REUNIONS -->
     <div class="page" id="page-reunions">
       <div class="alert alert-info">📅 Heure fixée : <strong id="reun-heure-label">17h30</strong> · Tranche 1 → <strong id="reun-t1-label">2,50 €</strong> · Tranche 2 → <strong id="reun-t2-label">5,00 €</strong> · Amende absence dès la <strong id="reun-nb-label">3e</strong> absence : <strong id="reun-am-label">15 €</strong></div>
-      <div class="tabs"><div class="tab active" onclick="swTab(this,'tr2-l')">Réunions</div><div class="tab" onclick="swTab(this,'tr2-s')">Suivi absences</div><div class="tab" onclick="swTab(this,'tr2-n')">Nouvelle réunion</div></div>
+      <div class="tabs"><div class="tab active" onclick="swT(this,'tr2-l')">Réunions</div><div class="tab" onclick="swT(this,'tr2-s')">Suivi absences</div><div class="tab" onclick="swT(this,'tr2-n')">Nouvelle réunion</div></div>
       <div id="tr2-l"><div id="reun-saison-info" style="margin-bottom:14px"></div><div class="card" style="padding:0"><div class="table-wrap"><table>
         <thead><tr><th>Date</th><th>Titre</th><th>✅ À l'heure</th><th>⏰ Retards</th><th>❌ Absents</th><th>Actions</th></tr></thead>
         <tbody id="reun-tbody"></tbody>
@@ -2186,7 +2214,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
         <div id="reun-presences" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
         <div class="form-group"><label>Notes / Compte-rendu</label><textarea id="reun-notes" placeholder="Optionnel"></textarea></div>
         <div id="reun-preview" style="margin-top:12px"></div>
-        <button onclick="saveReunion()" style="margin-top:14px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Enregistrer la réunion</button>
+        <button onclick="saveReun()" style="margin-top:14px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Enregistrer la réunion</button>
       </div></div>
     </div>
 
@@ -2224,9 +2252,9 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
     <div class="page" id="page-pret-interet">
       <div class="alert alert-info">💰 Prêt avec intérêts : la somme est accordée à un membre. Les intérêts sont calculés selon le taux configuré. Le remboursement est lié au fond de votre choix.</div>
       <div class="tabs">
-        <div class="tab active" onclick="swTab(this,'tpi-l')">Prêts accordés</div>
-        <div class="tab" onclick="swTab(this,'tpi-r')">Remboursements</div>
-        <div class="tab" onclick="swTab(this,'tpi-n')">Nouveau prêt</div>
+        <div class="tab active" onclick="swT(this,'tpi-l')">Prêts accordés</div>
+        <div class="tab" onclick="swT(this,'tpi-r')">Remboursements</div>
+        <div class="tab" onclick="swT(this,'tpi-n')">Nouveau prêt</div>
       </div>
       <div id="tpi-l"><div class="card" style="padding:0"><div class="table-wrap"><table>
         <thead><tr><th>Bénéficiaire</th><th>Capital</th><th>Intérêts</th><th>Total dû</th><th>Fond lié</th><th>Durée</th><th>Statut</th><th>Actions</th></tr></thead>
@@ -2268,7 +2296,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
           <div class="form-group"><label>Motif</label><input type="text" id="pi-motif" placeholder="Ex: achat matériel, urgence..."></div>
         </div>
         <div id="pi-preview" style="margin-top:16px"></div>
-        <button onclick="addPretInteret()" style="margin-top:16px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:11px 28px;font-size:14px;font-weight:600;cursor:pointer">Accorder le prêt</button>
+        <button onclick="addPI()" style="margin-top:16px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:11px 28px;font-size:14px;font-weight:600;cursor:pointer">Accorder le prêt</button>
       </div></div>
     </div>
 
@@ -2329,7 +2357,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
         <div class="card-title" style="color:var(--red)">⚠ Zone de danger</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button onclick="exportData()" class="btn btn-secondary btn-sm">📥 Exporter mes données</button>
-          <button onclick="resetSetup()" class="btn btn-secondary btn-sm">🔑 Changer les clés Supabase</button>
+          <button onclick="resetSU()" class="btn btn-secondary btn-sm">🔑 Changer les clés Supabase</button>
         </div>
       </div>
     </div>
@@ -2351,7 +2379,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
       <div class="form-group" style="grid-column:1/-1"><label>Note</label><textarea id="mm-note" placeholder="Optionnel"></textarea></div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-secondary" style="width:auto" onclick="closeModal('modal-m')">Annuler</button>
+      <button class="btn btn-secondary" style="width:auto" onclick="closeMO('modal-m')">Annuler</button>
       <button class="btn btn-primary" style="width:auto" onclick="saveMembre()">Enregistrer</button>
     </div>
   </div>
@@ -2364,7 +2392,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
     <input type="hidden" id="pay-tb"><input type="hidden" id="pay-id">
     <div class="form-group"><label>Date de paiement</label><input type="date" id="pay-dt"></div>
     <div class="modal-actions">
-      <button class="btn btn-secondary" style="width:auto" onclick="closeModal('modal-pay')">Annuler</button>
+      <button class="btn btn-secondary" style="width:auto" onclick="closeMO('modal-pay')">Annuler</button>
       <button onclick="confirmPay()" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer">✓ Confirmer</button>
     </div>
   </div>
@@ -2385,7 +2413,7 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
       <button class="btn btn-danger btn-sm" id="reun-modal-del">Supprimer</button>
       <button class="btn btn-secondary btn-sm" id="reun-modal-edit-btn" onclick="toggleReunEdit()">Modifier</button>
       <button class="btn btn-primary btn-sm" id="reun-modal-save" style="display:none;width:auto" onclick="saveReunEdit()">Sauvegarder</button>
-      <button class="btn btn-secondary" style="width:auto" onclick="closeModal('modal-reun')">Fermer</button>
+      <button class="btn btn-secondary" style="width:auto" onclick="closeMO('modal-reun')">Fermer</button>
     </div>
   </div>
 </div>
