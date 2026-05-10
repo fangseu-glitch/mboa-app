@@ -1,0 +1,1873 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mboa — Gestion d'Association</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--bg2:#181b24;--bg3:#1e2230;--card:#232736;--border:#2e3348;--accent:#f5c842;--accent2:#e8a020;--green:#3ecf8e;--red:#f4645f;--blue:#5b8def;--purple:#9b72e8;--text:#f0f2f8;--text2:#8b91a8;--text3:#5a607a;--radius:12px;--radius-sm:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.hidden{display:none!important}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;transition:all .15s}
+.btn-primary{background:var(--accent);color:#1a1400;width:100%;padding:12px}
+.btn-primary:hover{background:var(--accent2)}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:rgba(244,100,95,.15);color:var(--red);border:1px solid rgba(244,100,95,.3)}
+.btn-sm{padding:5px 10px;font-size:12px}
+input,select,textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:80px}
+select option{background:var(--bg2)}
+label{display:block;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:500}
+.form-group{margin-bottom:14px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.alert{border-radius:var(--radius-sm);padding:11px 14px;font-size:13px;margin-bottom:14px;border:1px solid;line-height:1.5}
+.alert-error{background:rgba(244,100,95,.1);border-color:rgba(244,100,95,.3);color:var(--red)}
+.alert-success{background:rgba(62,207,142,.1);border-color:rgba(62,207,142,.3);color:var(--green)}
+.alert-info{background:rgba(91,141,239,.1);border-color:rgba(91,141,239,.3);color:var(--blue)}
+.alert-warning{background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.3);color:var(--accent)}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.badge-green{background:rgba(62,207,142,.15);color:var(--green)}.badge-red{background:rgba(244,100,95,.15);color:var(--red)}.badge-yellow{background:rgba(245,200,66,.15);color:var(--accent)}.badge-gray{background:rgba(139,145,168,.15);color:var(--text2)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 12px;color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid rgba(46,51,72,.5);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:18px}
+.card-title{font-family:'DM Serif Display',serif;font-size:17px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:22px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card.yellow::before{background:var(--accent)}.stat-card.green::before{background:var(--green)}.stat-card.red::before{background:var(--red)}.stat-card.blue::before{background:var(--blue)}
+.stat-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.stat-val{font-size:24px;font-weight:600;font-family:'DM Serif Display',serif}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:3px}
+.empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:14px}
+.progress{background:var(--bg3);border-radius:4px;height:6px;overflow:hidden}
+.progress-bar{height:100%;border-radius:4px;background:var(--green)}
+.member-row{display:flex;align-items:center;gap:8px}
+.avatar{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:11px;flex-shrink:0}
+.c0{background:#5b8def22;color:#5b8def}.c1{background:#9b72e822;color:#9b72e8}.c2{background:#f5c84222;color:#f5c842}.c3{background:#3ecf8e22;color:#3ecf8e}.c4{background:#f4645f22;color:#f4645f}.c5{background:#e8a02022;color:#e8a020}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:18px;overflow-x:auto}
+.tab{padding:9px 16px;font-size:13px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;white-space:nowrap}
+.tab:hover{color:var(--text)}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(26,20,0,.3);border-top-color:#1a1400;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SETUP */
+#screen-setup{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.setup-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:40px;width:100%;max-width:480px}
+.logo{font-family:'DM Serif Display',serif;font-size:36px;color:var(--accent);text-align:center;margin-bottom:6px}
+.tagline{text-align:center;font-size:13px;color:var(--text3);margin-bottom:28px}
+.step-box{background:var(--bg3);border-radius:var(--radius-sm);padding:14px;margin-bottom:16px;font-size:13px;color:var(--text2);line-height:1.8}
+.step-box strong{color:var(--text)}
+
+/* AUTH */
+#screen-auth{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:36px;width:100%;max-width:420px}
+.auth-tabs{display:flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:22px}
+.auth-tab{flex:1;padding:10px;text-align:center;font-size:14px;cursor:pointer;background:var(--bg3);color:var(--text2);transition:all .15s}
+.auth-tab.active{background:var(--accent);color:#1a1400;font-weight:600}
+
+/* APP */
+#screen-app{display:none}
+#sidebar{position:fixed;left:0;top:0;bottom:0;width:225px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .3s}
+.sb-header{padding:18px 20px;border-bottom:1px solid var(--border)}
+.sb-asso{font-family:'DM Serif Display',serif;font-size:22px;color:var(--accent)}
+.sb-plan{font-size:11px;color:var(--text3);margin-top:2px}
+.sb-user{padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:rgba(245,200,66,.2);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
+.nav-section{padding:10px 0 4px}
+.nav-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;padding:0 20px;margin-bottom:4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 20px;cursor:pointer;border-left:3px solid transparent;font-size:13px;color:var(--text2);transition:all .15s;user-select:none}
+.nav-item:hover{color:var(--text);background:var(--bg3)}.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(245,200,66,.07)}
+.nav-item svg{width:15px;height:15px;flex-shrink:0}
+.sb-footer{margin-top:auto;padding:14px 20px;border-top:1px solid var(--border)}
+#main{margin-left:225px;min-height:100vh}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:13px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-title{font-family:'DM Serif Display',serif;font-size:18px;display:flex;align-items:center;gap:10px}
+#hamburger{display:none;background:none;border:none;color:var(--text);cursor:pointer;padding:4px}
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
+.page{padding:22px;display:none}.page.active{display:block}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto}
+.modal h3{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:18px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;flex-wrap:wrap}
+
+@media(max-width:900px){
+  #sidebar{transform:translateX(-100%) !important}
+  #sidebar.open{transform:translateX(0) !important}
+  #main{margin-left:0 !important}
+  #hamburger{display:block !important}
+  .page{padding:12px}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .form-grid{grid-template-columns:1fr}
+  td,th{padding:7px 8px;font-size:12px}
+}
+@media(max-width:480px){
+  .stat-grid{grid-template-columns:1fr}
+  .tab{padding:7px 10px;font-size:12px}
+}
+.nav-item{min-height:44px}
+input,select{font-size:16px !important}#sidebar.open{transform:translateX(0)}
+  #main{margin-left:0}#hamburger{display:block}.page{padding:14px}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ======================== SETUP ======================== -->
+<div id="screen-setup" class="hidden">
+  <div class="setup-box">
+    <div class="logo">Mboa</div>
+    <p class="tagline">Configuration de la connexion Supabase</p>
+    <div id="setup-err" class="alert alert-error hidden"></div>
+    <div class="step-box">
+      <strong>Où trouver ces informations ?</strong><br>
+      1. Allez sur <a href="https://supabase.com" target="_blank" style="color:var(--blue)">supabase.com</a> → connectez-vous<br>
+      2. Cliquez sur votre projet <strong>mboa</strong><br>
+      3. Menu gauche → <strong>Settings ⚙️</strong> → <strong>API</strong><br>
+      4. Copiez <strong>Project URL</strong> et la clé <strong>anon public</strong>
+    </div>
+    <div class="form-group"><label>Project URL</label><input type="url" id="s-url" placeholder="https://abcxyz.supabase.co"></div>
+    <div class="form-group"><label>Clé anon public</label><input type="text" id="s-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></div>
+    <button class="btn btn-primary" onclick="saveSetup()">Connecter →</button>
+    <p style="font-size:12px;color:var(--text3);text-align:center;margin-top:12px">Ces informations sont stockées dans votre navigateur uniquement.</p>
+  </div>
+</div>
+
+<!-- ======================== AUTH ======================== -->
+<div id="screen-auth" class="hidden">
+  <div class="auth-box">
+    <div class="logo">Mboa</div>
+    <p class="tagline">Gestion d'association professionnelle</p>
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="authTab('login')">Connexion</div>
+      <div class="auth-tab" onclick="authTab('register')">Créer un compte</div>
+    </div>
+    <div id="auth-msg" class="hidden"></div>
+
+    <div id="f-login">
+      <div class="form-group"><label>Email</label><input type="email" id="li-email" placeholder="vous@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="form-group"><label>Mot de passe</label><input type="password" id="li-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn btn-primary" id="btn-li" onclick="doLogin()">Se connecter</button>
+      <div style="text-align:center;margin-top:12px"><a href="#" onclick="forgotPwd()" style="font-size:13px;color:var(--text3)">Mot de passe oublié ?</a></div>
+    </div>
+
+    <div id="f-register" class="hidden">
+      <div class="form-group"><label>Nom de l'association</label><input type="text" id="rg-asso" placeholder="Ex: Association Mboa"></div>
+      <div class="form-group"><label>Votre prénom</label><input type="text" id="rg-prenom" placeholder="Jean"></div>
+      <div class="form-group"><label>Votre nom</label><input type="text" id="rg-nom" placeholder="Dupont"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="rg-email" placeholder="vous@email.com"></div>
+      <div class="form-group"><label>Mot de passe (min. 8 caractères)</label><input type="password" id="rg-pwd" placeholder="••••••••"></div>
+      <button class="btn btn-primary" id="btn-rg" onclick="doRegister()">Créer mon espace gratuit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== APP ======================== -->
+<div id="screen-app">
+  <nav id="sidebar">
+    <div class="sb-header"><div class="sb-asso" id="sb-nom">Mboa</div><div class="sb-plan" id="sb-plan">Plan gratuit</div></div>
+    <div class="sb-user"><div class="sb-avatar" id="sb-av">?</div><div><div style="font-size:13px;font-weight:500" id="sb-user">—</div><div style="font-size:11px;color:var(--text3)" id="sb-role">Admin</div></div></div>
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <div class="nav-item active" onclick="goto('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Tableau de bord</div>
+      <div class="nav-item" onclick="goto('membres')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Membres</div>
+      <div class="nav-item" onclick="goto('reunions')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Réunions</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Finances</div>
+      <div class="nav-item" onclick="goto('cotisations')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Cotisations</div>
+      <div class="nav-item" onclick="goto('adhesion')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg>Adhésion</div>
+      <div class="nav-item" onclick="goto('retards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Retards</div>
+      <div class="nav-item" onclick="goto('amendes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>Amendes</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Fonds</div>
+      <div class="nav-item" onclick="goto('dons')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Dons</div>
+      <div class="nav-item" onclick="goto('prets')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Prêts</div>
+      <div class="nav-item" onclick="goto('fond-caisse')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4"/><path d="M2 13v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6"/><circle cx="12" cy="10" r="2"/></svg>Fond Caisse</div>
+      <div class="nav-item" onclick="goto('fond-cotisation')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Fond Cotisation</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Admin</div>
+      <div class="nav-item" onclick="goto('comptabilite')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Comptabilité</div>
+      <div class="nav-item" onclick="goto('alertes')" id="nav-alertes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Alertes <span id="badge-alertes" style="display:none;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px">0</span></div>
+      <div class="nav-item" onclick="goto('mon-compte')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg>Mon Compte</div>
+      <div class="nav-item" onclick="goto('pret-interet')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/><circle cx="19" cy="5" r="3"/></svg>Prêts + Intérêts</div>
+      <div class="nav-item" onclick="goto('configuration')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>Configuration</div>
+      <div class="nav-item" id="nav-superadmin" style="display:none;border-top:1px solid var(--border);margin-top:8px" onclick="goto('superadmin')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Super Admin</div>
+    </div>
+    <div class="sb-footer">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Mboa · <span id="sb-count">0</span> membre(s)</div>
+      <button onclick="doLogout()" style="width:100%;background:none;border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:7px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif" onmouseover="this.style.color='var(--red)';this.style.borderColor='rgba(244,100,95,.4)'" onmouseout="this.style.color='var(--text2)';this.style.borderColor='var(--border)'">Déconnexion</button>
+    </div>
+  </nav>
+
+  <div id="overlay" onclick="closeSidebar()"></div>
+
+  <div id="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button id="hamburger" onclick="toggleSidebar()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <span class="topbar-title" id="page-title">Tableau de bord</span>
+      </div>
+      <span id="topbar-date" style="font-size:12px;color:var(--text3)"></span>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div id="dash-warn"></div>
+      <div class="stat-grid" id="dash-stats">
+        <div class="stat-card yellow"><div class="stat-label">Membres actifs</div><div class="stat-val">—</div></div>
+        <div class="stat-card green"><div class="stat-label">Cotisations</div><div class="stat-val">—</div></div>
+        <div class="stat-card blue"><div class="stat-label">Fond adhésion</div><div class="stat-val">—</div></div>
+        <div class="stat-card red"><div class="stat-label">Plan</div><div class="stat-val">—</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+        <div class="card"><div class="card-title">Fonds adhésion par membre</div><div id="dash-fonds"><div class="empty">Chargement…</div></div></div>
+        <div class="card"><div class="card-title">Résumé financier</div><div id="dash-resume"><div class="empty">Chargement…</div></div></div>
+      </div>
+    </div>
+
+    <!-- MEMBRES -->
+    <div class="page" id="page-membres">
+      <div class="card">
+        <div class="card-title">Membres <button class="btn btn-primary btn-sm" style="width:auto" onclick="openModalMembre()">+ Ajouter</button></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Membre</th><th>Téléphone</th><th>Email</th><th>Statut</th><th>Fonds adhésion</th><th>Actions</th></tr></thead>
+          <tbody id="m-tbody"><tr><td colspan="6"><div class="empty">Chargement…</div></td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- COTISATIONS -->
+    <div class="page" id="page-cotisations">
+      <div class="tabs"><div class="tab active" onclick="swTab(this,'tc-l')">Liste</div><div class="tab" onclick="swTab(this,'tc-n')">Nouvelle</div></div>
+      <div id="tc-l">
+        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+          <select id="cot-fm" onchange="renderCots()" style="width:200px"><option value="">Tous les membres</option></select>
+          <select id="cot-fs" onchange="renderCots()" style="width:140px"><option value="">Tous statuts</option><option value="payé">Payé</option><option value="impayé">Impayé</option></select>
+          <span id="cot-total" style="margin-left:auto;font-size:13px;color:var(--text2)"></span>
+        </div>
+        <div class="card" style="padding:0"><div class="table-wrap"><table>
+          <thead><tr><th>Membre</th><th>Mois</th><th>Montant</th><th>Date paiement</th><th>Statut</th><th>Actions</th></tr></thead>
+          <tbody id="cot-tbody"></tbody>
+        </table></div></div>
+      </div>
+      <div id="tc-n" class="hidden"><div class="card">
+        <div class="form-grid">
+          <div class="form-group"><label>Membre</label><select id="cot-m"></select></div>
+          <div class="form-group"><label>Mois</label><input type="month" id="cot-mo"></div>
+          <div class="form-group"><label>Montant (€)</label><input type="number" id="cot-mt" placeholder="20" min="0"></div>
+          <div class="form-group"><label>Date paiement</label><input type="date" id="cot-dt"></div>
+          <div class="form-group"><label>Statut</label><select id="cot-st"><option value="payé">Payé</option><option value="impayé">Impayé</option></select></div>
+          <div class="form-group"><label>Note</label><input type="text" id="cot-no" placeholder="Optionnel"></div>
+        </div>
+        <button onclick="addCot()" style="margin-top:14px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Enregistrer</button>
+      </div></div>
+    </div>
+
+    <!-- ADHESION -->
+    <div class="page" id="page-adhesion">
+      <div class="tabs"><div class="tab active" onclick="swTab(this,'ta-f')">Fonds</div><div class="tab" onclick="swTab(this,'ta-l')">Paiements</div><div class="tab" onclick="swTab(this,'ta-n')">Nouveau</div></div>
+      <div id="ta-f"><div class="card" style="padding:0"><div class="table-wrap"><table>
+        <thead><tr><th>Membre</th><th>Fonds adhésion (€)</th></tr></thead><tbody id="adh-fonds-tb"></tbody>
+      </table></div></div></div>
+      <div id="ta-l" class="hidden"><div class="card" style="padding:0"><div class="table-wrap"><table>
+        <thead><tr><th>Membre</th><th>Année</th><th>Montant</th><th>Date</th><th>Statut</th></tr></thead><tbody id="adh-tb"></tbody>
+      </table></div></div></div>
+      <div id="ta-n" class="hidden"><div class="card">
+        <div class="form-grid">
+          <div class="form-group"><label>Membre</label><select id="adh-m"></select></div>
+          <div class="form-group"><label>Année</label><input type="number" id="adh-an" min="2020" max="2035"></div>
+          <div class="form-group"><label>Montant (€)</label><input type="number" id="adh-mt" placeholder="100" min="0"></div>
+          <div class="form-group"><label>Date</label><input type="date" id="adh-dt"></div>
+          <div class="form-group"><label>Statut</label><select id="adh-st"><option value="payé">Payé</option><option value="impayé">Impayé</option></select></div>
+        </div>
+        <button onclick="addAdh()" style="margin-top:14px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Enregistrer</button>
+      </div></div>
+    </div>
+
+    <!-- RETARDS -->
+    <div class="page" id="page-retards">
+      <div class="tabs"><div class="tab active" onclick="swTab(this,'tr-l')">Liste</div><div class="tab" onclick="swTab(this,'tr-n')">Nouveau</div></div>
+      <div id="tr-l"><div class="card" style="padding:0"><div class="table-wrap"><table>
+        <thead><tr><th>Membre</th><th>Motif</th><th>Montant</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="ret-tbody"></tbody>
+      </table></div></div></div>
+      <div id="tr-n" class="hidden"><div class="card">
+        <div class="form-grid">
+          <div class="form-group"><label>Membre</label><select id="ret-m"></select></div>
+          <div class="form-group"><label>Motif</label><input type="text" id="ret-mo" placeholder="Ex: retard réunion..."></div>
+          <div class="form-group"><label>Montant (€)</label><input type="number" id="ret-mt" placeholder="5" min="0"></div>
+          <div class="form-group"><label>Date</label><input type="date" id="ret-dt"></div>
+        </div>
+        <button onclick="addRet()" style="margin-top:14px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Enregistrer</button>
+      </div></div>
+    </div>
+
+    <!-- AMENDES -->
+    <div class="page" id="page-amendes">
+      <div class="tabs"><div class="tab active" onclick="swTab(this,'tam-l')">Liste</div><div class="tab" onclick="swTab(this,'tam-n')">Nouvelle</div></div>
+      <div id="tam-l"><div class="card" style="padding:0"><div class="table-wrap"><table>
+        <thead><tr><th>Membre</th><th>Motif</th><th>Montant</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="am-tbody"></tbody>
+      </table></div></div></div>
+      <div id="tam-n" class="hidden"><div class="card">
+        <div class="form-grid">
+          <div class="form-group"><label>Membre</label><select id="am-m"></select></div>
+          <div class="form-group"><label>Motif</label><input type="text" id="am-mo" placeholder="Ex: comportement..."></div>
+          <div class="form-group"><label>Montant (€)</label><input type="number" id="am-mt" placeholder="15" min="0"></div>
+          <div class="form-group"><label>Date</label><input type="date" id="am-dt"></div>
+        </div>
+        <button onclick="addAm()" style="margin-top:14px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Enregistrer</button>
+      </div></div>
+    </div>
+
+    <!-- DONS -->
+    <div class="page" id="page-dons">
+      <div class="alert alert-info">❤ Un membre reçoit un don prélevé sur le fonds adhésion des autres membres. Délai remboursement : selon configuration (défaut 3 mois).</div>
+      <div class="tabs"><div class="tab active" onclick="swTab(this,'td-l')">Dons accordés</div><div class="tab" onclick="swTab(this,'td-r')">Remboursements</div><div class="tab" onclick="swTab(this,'td-n')">Nouveau don</div></div>
+      <div id="td-l"><div class="card" style="padding:0"><div class="table-wrap"><table>
+        <thead><tr><th>Bénéficiaire</th><th>Montant</th><th>Date</th><th>Motif</th><th>Remboursements</th><th>Actions</th></tr></thead>
+        <tbody id="don-tbody"></tbody>
+      </table></div></div></div>
+      <div id="td-r" class="hidden"><div class="card" style="padding:0"><div class="table-wrap"><table>
+        <thead><tr><th>Don</th><th>Contributeur</th><th>Quote-part</th><th>Échéance</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="don-remb-tbody"></tbody>
+      </table></div></div></div>
+      <div id="td-n" class="hidden"><div class="card">
+        <div class="form-grid">
+          <div class="form-group"><label>Bénéficiaire</label><select id="don-benef"></select></div>
+          <div class="form-group"><label>Montant (€)</label><input type="number" id="don-mt" placeholder="200" min="0" oninput="previewDon()"></div>
+          <div class="form-group"><label>Date</label><input type="date" id="don-dt"></div>
+          <div class="form-group" style="grid-column:1/-1"><label>Motif</label><input type="text" id="don-mo" placeholder="Ex: aide maladie, naissance..."></div>
+        </div>
+        <div id="don-preview" style="margin-top:12px"></div>
+        <button onclick="addDon()" style="margin-top:14px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Créer le don</button>
+      </div></div>
+    </div>
+
+    <!-- PRETS -->
+    <div class="page" id="page-prets">
+      <div class="alert alert-info">💸 Le prêt est réparti sur tous les membres actifs. Chacun rembourse sa quote-part dans le délai configuré.</div>
+      <div class="tabs"><div class="tab active" onclick="swTab(this,'tp-l')">Prêts accordés</div><div class="tab" onclick="swTab(this,'tp-r')">Remboursements</div><div class="tab" onclick="swTab(this,'tp-n')">Nouveau prêt</div></div>
+      <div id="tp-l"><div class="card" style="padding:0"><div class="table-wrap"><table>
+        <thead><tr><th>Bénéficiaire</th><th>Montant</th><th>Date</th><th>Motif</th><th>Remboursements</th><th>Actions</th></tr></thead>
+        <tbody id="pret-tbody"></tbody>
+      </table></div></div></div>
+      <div id="tp-r" class="hidden"><div class="card" style="padding:0"><div class="table-wrap"><table>
+        <thead><tr><th>Prêt</th><th>Membre</th><th>Quote-part</th><th>Échéance</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="pret-remb-tbody"></tbody>
+      </table></div></div></div>
+      <div id="tp-n" class="hidden"><div class="card">
+        <div class="form-grid">
+          <div class="form-group"><label>Bénéficiaire</label><select id="pret-benef"></select></div>
+          <div class="form-group"><label>Montant (€)</label><input type="number" id="pret-mt" placeholder="500" min="0" oninput="previewPret()"></div>
+          <div class="form-group"><label>Date</label><input type="date" id="pret-dt"></div>
+          <div class="form-group" style="grid-column:1/-1"><label>Motif</label><input type="text" id="pret-mo" placeholder="Ex: urgence, projet..."></div>
+        </div>
+        <div id="pret-preview" style="margin-top:12px"></div>
+        <button onclick="addPret()" style="margin-top:14px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Créer le prêt</button>
+      </div></div>
+    </div>
+
+    <!-- FOND CAISSE -->
+    <div class="page" id="page-fond-caisse">
+      <div class="alert alert-info">🏦 Alimenté par les retards et amendes payés. Les sorties manuelles débitent ce fond.</div>
+      <div class="stat-grid" id="caisse-stats"></div>
+      <div class="tabs"><div class="tab active" onclick="swTab(this,'tfc-l')">Journal</div><div class="tab" onclick="swTab(this,'tfc-n')">Nouvelle sortie</div></div>
+      <div id="tfc-l"><div class="card" style="padding:0"><div class="table-wrap"><table>
+        <thead><tr><th>Date</th><th>Type</th><th>Membre</th><th>Description</th><th>Entrée (€)</th><th>Sortie (€)</th><th>Solde (€)</th></tr></thead>
+        <tbody id="caisse-tbody"></tbody>
+      </table></div></div></div>
+      <div id="tfc-n" class="hidden"><div class="card">
+        <div class="form-grid">
+          <div class="form-group"><label>Description</label><input type="text" id="caisse-desc" placeholder="Ex: achat matériel..."></div>
+          <div class="form-group"><label>Montant (€)</label><input type="number" id="caisse-mt" placeholder="0" min="0"></div>
+          <div class="form-group"><label>Date</label><input type="date" id="caisse-dt"></div>
+        </div>
+        <button onclick="addSortieCaisse()" style="margin-top:14px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Enregistrer la sortie</button>
+      </div></div>
+    </div>
+
+    <!-- FOND COTISATION -->
+    <div class="page" id="page-fond-cotisation">
+      <div class="alert alert-info">💳 Alimenté par les cotisations payées. Les virements vers membres débitent ce fond.</div>
+      <div class="stat-grid" id="fondcot-stats"></div>
+      <div class="tabs"><div class="tab active" onclick="swTab(this,'tfcot-l')">Journal</div><div class="tab" onclick="swTab(this,'tfcot-n')">Virement vers membre</div></div>
+      <div id="tfcot-l"><div class="card" style="padding:0"><div class="table-wrap"><table>
+        <thead><tr><th>Date</th><th>Type</th><th>Membre</th><th>Description</th><th>Entrée (€)</th><th>Sortie (€)</th><th>Solde (€)</th></tr></thead>
+        <tbody id="fondcot-tbody"></tbody>
+      </table></div></div></div>
+      <div id="tfcot-n" class="hidden"><div class="card">
+        <div class="form-grid">
+          <div class="form-group"><label>Bénéficiaire</label><select id="vir-membre"></select></div>
+          <div class="form-group"><label>Montant (€)</label><input type="number" id="vir-mt" placeholder="0" min="0"></div>
+          <div class="form-group"><label>Date</label><input type="date" id="vir-dt"></div>
+          <div class="form-group"><label>Motif</label><input type="text" id="vir-mo" placeholder="Ex: aide exceptionnelle..."></div>
+        </div>
+        <div id="vir-solde" style="margin-top:10px"></div>
+        <button onclick="addVirement()" style="margin-top:14px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Effectuer le virement</button>
+      </div></div>
+    </div>
+
+    <!-- REUNIONS -->
+    <div class="page" id="page-reunions">
+      <div class="alert alert-info">📅 Heure fixée : <strong id="reun-heure-label">17h30</strong> · Tranche 1 → <strong id="reun-t1-label">2,50 €</strong> · Tranche 2 → <strong id="reun-t2-label">5,00 €</strong> · Amende absence dès la <strong id="reun-nb-label">3e</strong> absence : <strong id="reun-am-label">15 €</strong></div>
+      <div class="tabs"><div class="tab active" onclick="swTab(this,'tr2-l')">Réunions</div><div class="tab" onclick="swTab(this,'tr2-s')">Suivi absences</div><div class="tab" onclick="swTab(this,'tr2-n')">Nouvelle réunion</div></div>
+      <div id="tr2-l"><div id="reun-saison-info" style="margin-bottom:14px"></div><div class="card" style="padding:0"><div class="table-wrap"><table>
+        <thead><tr><th>Date</th><th>Titre</th><th>✅ À l'heure</th><th>⏰ Retards</th><th>❌ Absents</th><th>Actions</th></tr></thead>
+        <tbody id="reun-tbody"></tbody>
+      </table></div></div></div>
+      <div id="tr2-s" class="hidden"><div class="card" style="padding:0"><div class="table-wrap"><table>
+        <thead><tr><th>Membre</th><th>Réunions</th><th>Présences</th><th>Retards</th><th>Absences</th><th>Amendes</th></tr></thead>
+        <tbody id="reun-suivi-tbody"></tbody>
+      </table></div></div></div>
+      <div id="tr2-n" class="hidden"><div class="card">
+        <div class="form-grid">
+          <div class="form-group"><label>Titre</label><input type="text" id="reun-titre" placeholder="Ex: Réunion mensuelle janvier"></div>
+          <div class="form-group"><label>Date</label><input type="date" id="reun-dt"></div>
+          <div class="form-group"><label>Lieu</label><input type="text" id="reun-lieu" placeholder="Optionnel"></div>
+        </div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
+        <div style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Présences & Arrivées</div>
+        <div id="reun-presences" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+        <div class="form-group"><label>Notes / Compte-rendu</label><textarea id="reun-notes" placeholder="Optionnel"></textarea></div>
+        <div id="reun-preview" style="margin-top:12px"></div>
+        <button onclick="saveReunion()" style="margin-top:14px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Enregistrer la réunion</button>
+      </div></div>
+    </div>
+
+    <!-- COMPTABILITE -->
+    <div class="page" id="page-comptabilite">
+      <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center">
+        <select id="compta-annee" onchange="renderCompta()" style="width:120px"></select>
+        <button onclick="exportCSV()" class="btn btn-secondary btn-sm">📥 Export CSV</button>
+        <button onclick="window.print()" class="btn btn-secondary btn-sm">🖨 Imprimer</button>
+      </div>
+      <div class="stat-grid" id="compta-stats"></div>
+      <div class="card"><div class="card-title">Journal des opérations</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Date</th><th>Type</th><th>Membre</th><th>Description</th><th>Débit (€)</th><th>Crédit (€)</th><th>Solde</th></tr></thead>
+          <tbody id="compta-tbody"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ALERTES -->
+    <div class="page" id="page-alertes">
+      <div id="alertes-container"><div class="empty">Chargement des alertes...</div></div>
+    </div>
+
+    <!-- MON COMPTE -->
+    <div class="page" id="page-mon-compte">
+      <div style="margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <label style="font-size:13px;color:var(--text2)">Sélectionner un membre :</label>
+        <select id="mc-select" onchange="renderMonCompte()" style="width:240px"><option value="">— Choisir —</option></select>
+      </div>
+      <div id="mc-content"><div class="empty">Sélectionnez un membre pour voir son tableau de bord</div></div>
+    </div>
+
+    <!-- PRET AVEC INTERETS -->
+    <div class="page" id="page-pret-interet">
+      <div class="alert alert-info">💰 Prêt avec intérêts : la somme est accordée à un membre. Les intérêts sont calculés selon le taux configuré. Le remboursement est lié au fond de votre choix.</div>
+      <div class="tabs">
+        <div class="tab active" onclick="swTab(this,'tpi-l')">Prêts accordés</div>
+        <div class="tab" onclick="swTab(this,'tpi-r')">Remboursements</div>
+        <div class="tab" onclick="swTab(this,'tpi-n')">Nouveau prêt</div>
+      </div>
+      <div id="tpi-l"><div class="card" style="padding:0"><div class="table-wrap"><table>
+        <thead><tr><th>Bénéficiaire</th><th>Capital</th><th>Intérêts</th><th>Total dû</th><th>Fond lié</th><th>Durée</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="pi-tbody"></tbody>
+      </table></div></div></div>
+      <div id="tpi-r" class="hidden"><div class="card" style="padding:0"><div class="table-wrap"><table>
+        <thead><tr><th>Prêt</th><th>Mensualité</th><th>Échéance</th><th>Capital</th><th>Intérêts</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="pi-remb-tbody"></tbody>
+      </table></div></div></div>
+      <div id="tpi-n" class="hidden"><div class="card">
+        <div style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)">Informations du prêt</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Bénéficiaire</label><select id="pi-benef"></select></div>
+          <div class="form-group"><label>Montant capital (€)</label><input type="number" id="pi-capital" placeholder="500" min="0" oninput="previewPretInteret()"></div>
+          <div class="form-group"><label>Date d'octroi</label><input type="date" id="pi-date"></div>
+          <div class="form-group"><label>Durée (mois)</label><input type="number" id="pi-duree" placeholder="6" min="1" max="60" value="6" oninput="previewPretInteret()"></div>
+        </div>
+        <div style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)">Calcul des intérêts</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Type de taux</label>
+            <select id="pi-type-taux" onchange="previewPretInteret()">
+              <option value="annuel">Taux fixe annuel (%)</option>
+              <option value="mensuel">Taux mensuel (%)</option>
+              <option value="fixe">Montant fixe (€)</option>
+            </select>
+          </div>
+          <div class="form-group"><label id="pi-taux-label">Taux annuel (%)</label><input type="number" id="pi-taux" placeholder="5" min="0" step="0.1" oninput="previewPretInteret()"></div>
+        </div>
+        <div style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)">Fond lié au remboursement</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Fond de remboursement</label>
+            <select id="pi-fond" onchange="previewPretInteret()">
+              <option value="caisse">Fond Caisse</option>
+              <option value="adhesion">Fond Adhésion</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Motif</label><input type="text" id="pi-motif" placeholder="Ex: achat matériel, urgence..."></div>
+        </div>
+        <div id="pi-preview" style="margin-top:16px"></div>
+        <button onclick="addPretInteret()" style="margin-top:16px;background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:11px 28px;font-size:14px;font-weight:600;cursor:pointer">Accorder le prêt</button>
+      </div></div>
+    </div>
+
+    <!-- SUPERADMIN -->
+    <div class="page" id="page-superadmin">
+      <div class="stat-grid" id="sa-stats"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px">
+        <div class="card"><div class="card-title">Associations <span id="sa-total-badge" class="badge badge-yellow">0</span></div><div id="sa-assoc-list"><div class="empty">Chargement...</div></div></div>
+        <div class="card"><div class="card-title">Alertes &amp; Support</div><div id="sa-alerts"><div class="empty">Chargement...</div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Modifier une association</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Association</label><select id="sa-sel-assoc" onchange="loadSAAssoc()"><option value="">-- Choisir --</option></select></div>
+          <div class="form-group"><label>Plan</label><select id="sa-plan"><option value="gratuit">Gratuit (max 10 membres)</option><option value="starter">Starter (membres illimites)</option><option value="pro">Pro (fonctions avancees)</option></select></div>
+          <div class="form-group"><label>Limite membres (0 = illimite)</label><input type="number" id="sa-limit" value="0" min="0"></div>
+        </div>
+        <div id="sa-msg" class="hidden" style="margin-bottom:12px"></div>
+        <button onclick="saveSAAssoc()" style="background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">Appliquer les modifications</button>
+      </div>
+    </div>
+
+    <!-- CONFIGURATION -->
+    <div class="page" id="page-configuration">
+      <div class="card">
+        <div class="card-title">⚙️ Configuration</div>
+        <div style="margin-bottom:18px">
+          <div style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)">🏢 Identité</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Nom de l'association</label><input type="text" id="cf-nom"></div>
+            <div class="form-group"><label>Couleur accent</label><div style="display:flex;gap:8px"><input type="color" id="cf-col" style="width:44px;height:38px;padding:2px;cursor:pointer"><input type="text" id="cf-col-hex" placeholder="#f5c842" style="flex:1"></div></div>
+          </div>
+        </div>
+        <div style="margin-bottom:18px">
+          <div style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)">📅 Réunions & Absences</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Heure fixée</label><input type="time" id="cf-heure" value="17:30"></div>
+            <div class="form-group"><label>Fin tranche 1 (→ montant 1)</label><input type="time" id="cf-t1" value="18:00"></div>
+            <div class="form-group"><label>Montant tranche 1 (€)</label><input type="number" id="cf-m1" value="2.5" step="0.5" min="0"></div>
+            <div class="form-group"><label>Fin tranche 2 (→ montant 2)</label><input type="time" id="cf-t2" value="19:00"></div>
+            <div class="form-group"><label>Montant tranche 2 (€)</label><input type="number" id="cf-m2" value="5" step="0.5" min="0"></div>
+            <div class="form-group"><label>Amende absence (€)</label><input type="number" id="cf-am" value="15" min="0"></div>
+            <div class="form-group"><label>Absences avant amende</label><input type="number" id="cf-nba" value="3" min="1"></div>
+            <div class="form-group"><label>Mois reset</label><select id="cf-mr"><option value="1">Janvier</option><option value="2">Février</option><option value="3">Mars</option><option value="4">Avril</option><option value="5">Mai</option><option value="6">Juin</option><option value="7">Juillet</option><option value="8">Août</option><option value="9">Septembre</option><option value="10" selected>Octobre</option><option value="11">Novembre</option><option value="12">Décembre</option></select></div>
+            <div class="form-group"><label>Durée remboursement (mois)</label><input type="number" id="cf-dr" value="3" min="1" max="24"></div>
+          </div>
+        </div>
+        <div id="cf-msg" class="hidden" style="margin-bottom:14px"></div>
+        <button onclick="saveConf()" style="background:var(--accent);color:#1a1400;border:none;border-radius:8px;padding:11px 28px;font-size:14px;font-weight:600;cursor:pointer">💾 Sauvegarder</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">💳 Abonnement</div>
+        <div id="cf-plan"></div>
+      </div>
+
+      <div class="card" style="border-color:rgba(244,100,95,.2)">
+        <div class="card-title" style="color:var(--red)">⚠ Zone de danger</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button onclick="exportData()" class="btn btn-secondary btn-sm">📥 Exporter mes données</button>
+          <button onclick="resetSetup()" class="btn btn-secondary btn-sm">🔑 Changer les clés Supabase</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MEMBRE -->
+<div class="modal-overlay" id="modal-m">
+  <div class="modal">
+    <h3 id="mm-titre">Nouveau membre</h3>
+    <input type="hidden" id="mm-id">
+    <div class="form-grid">
+      <div class="form-group"><label>Prénom *</label><input type="text" id="mm-prenom" placeholder="Jean"></div>
+      <div class="form-group"><label>Nom *</label><input type="text" id="mm-nom" placeholder="Dupont"></div>
+      <div class="form-group"><label>Téléphone</label><input type="tel" id="mm-tel" placeholder="+33 6..."></div>
+      <div class="form-group"><label>Email</label><input type="email" id="mm-email" placeholder="jean@email.com"></div>
+      <div class="form-group"><label>Date d'adhésion</label><input type="date" id="mm-date"></div>
+      <div class="form-group"><label>Statut</label><select id="mm-statut"><option value="actif">Actif</option><option value="inactif">Inactif</option></select></div>
+      <div class="form-group" style="grid-column:1/-1"><label>Note</label><textarea id="mm-note" placeholder="Optionnel"></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" style="width:auto" onclick="closeModal('modal-m')">Annuler</button>
+      <button class="btn btn-primary" style="width:auto" onclick="saveMembre()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PAIEMENT -->
+<div class="modal-overlay" id="modal-pay">
+  <div class="modal" style="max-width:360px">
+    <h3>Confirmer le paiement</h3>
+    <input type="hidden" id="pay-tb"><input type="hidden" id="pay-id">
+    <div class="form-group"><label>Date de paiement</label><input type="date" id="pay-dt"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" style="width:auto" onclick="closeModal('modal-pay')">Annuler</button>
+      <button onclick="confirmPay()" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer">✓ Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REUNION DETAIL -->
+<div class="modal-overlay" id="modal-reun">
+  <div class="modal" style="max-width:680px">
+    <h3 id="reun-modal-titre"></h3>
+    <div id="reun-modal-content"></div>
+    <div id="reun-modal-edit" class="hidden" style="margin-top:16px">
+      <hr style="border:none;border-top:1px solid var(--border);margin-bottom:16px">
+      <div style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Modifier les presences</div>
+      <div id="reun-edit-presences" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px"></div>
+      <div class="form-group"><label>Notes / Compte-rendu</label><textarea id="reun-edit-notes" style="min-height:100px"></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-danger btn-sm" id="reun-modal-del">Supprimer</button>
+      <button class="btn btn-secondary btn-sm" id="reun-modal-edit-btn" onclick="toggleReunEdit()">Modifier</button>
+      <button class="btn btn-primary btn-sm" id="reun-modal-save" style="display:none;width:auto" onclick="saveReunEdit()">Sauvegarder</button>
+      <button class="btn btn-secondary" style="width:auto" onclick="closeModal('modal-reun')">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+var SB_URL="https://nkfzmzbteqrdbyjtgwsh.supabase.co";
+var SUPERADMIN_EMAIL="superadmin@mboa.app";
+var IS_SUPERADMIN=false;
+var SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5rZnptemJ0ZXFyZGJ5anRnd3NoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNTcwNzEsImV4cCI6MjA5MzczMzA3MX0.L_kInjCx4gpTpe1LeiL8guEDMEjAwaBkj5oIiH5Hpkw";
+var sb=null,CU=null,CA=null,MC=[],FC={};
+var COLS=["c0","c1","c2","c3","c4","c5"];
+function td(){return new Date().toISOString().slice(0,10);}
+function fdD(d){return d?new Date(d).toLocaleDateString("fr-FR"):"--";}
+function fmt(n){return isNaN(+n)?"0,00":new Intl.NumberFormat("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2}).format(+n);}
+function addM(ds,n){var d=new Date(ds);d.setMonth(d.getMonth()+n);return d.toISOString().slice(0,10);}
+function ds2(yr){var d=new Date(yr,9,1);while(d.getDay()!==6)d.setDate(d.getDate()+1);d.setDate(d.getDate()+7);return d.toISOString().slice(0,10);}
+function saison(){var t=td(),yr=new Date().getFullYear();return t>=ds2(yr)?yr+1:yr;}
+function debut(){return ds2(saison()-1);}
+function dRemb(){return (CA&&CA.duree_remboursement_mois)||3;}
+function mCol(id){var i=MC.findIndex(function(x){return x.id===id;});return COLS[Math.max(0,i)%COLS.length];}
+function mNm(id){var m=MC.find(function(x){return x.id===id;});return m?(m.prenom+" "+m.nom):"?";}
+function mIn(id){var m=MC.find(function(x){return x.id===id;});return m?(m.prenom[0]+m.nom[0]).toUpperCase():"??";}
+function avEl(id){return '<div class="avatar '+mCol(id)+'">'+mIn(id)+'</div>';}
+function mChip(id){return '<div class="member-row">'+avEl(id)+'<span>'+mNm(id)+'</span></div>';}
+function E(id){return document.getElementById(id);}
+function sH(id,h){var e=E(id);if(e)e.innerHTML=h;}
+function gV(id){var e=E(id);return e?e.value.trim():"";}
+function showSS(name){
+  E("screen-setup").classList.add("hidden");
+  E("screen-auth").classList.add("hidden");
+  E("screen-app").style.display="none";
+  if(name==="setup")E("screen-setup").classList.remove("hidden");
+  if(name==="auth")E("screen-auth").classList.remove("hidden");
+  if(name==="app")E("screen-app").style.display="block";
+}
+function openMO(id){E(id).classList.add("open");}
+function closeMO(id){E(id).classList.remove("open");}
+function swT(el,id){
+  var pfx=id.split("-").slice(0,2).join("-");
+  document.querySelectorAll('[id^="'+pfx+'-"]').forEach(function(t){t.classList.add("hidden");});
+  E(id).classList.remove("hidden");
+  el.closest(".tabs").querySelectorAll(".tab").forEach(function(t){t.classList.remove("active");});
+  el.classList.add("active");
+}
+function togSB(){var s=E("sidebar");s.classList.toggle("open");E("overlay").style.display=s.classList.contains("open")?"block":"none";}
+function closeSB(){E("sidebar").classList.remove("open");E("overlay").style.display="none";}
+var TITLES={dashboard:"Tableau de bord",membres:"Membres",cotisations:"Cotisations",adhesion:"Adhesion",retards:"Retards",amendes:"Amendes",dons:"Dons",prets:"Prets simples","pret-interet":"Prets avec Interets","fond-caisse":"Fond Caisse","fond-cotisation":"Fond Cotisation",reunions:"Reunions",comptabilite:"Comptabilite",alertes:"Alertes","mon-compte":"Mon Compte",configuration:"Configuration",superadmin:"Super Admin"};
+function G(p){
+  document.querySelectorAll(".page").forEach(function(x){x.classList.remove("active");});
+  document.querySelectorAll(".ni").forEach(function(x){x.classList.remove("active");});
+  var pg=E("page-"+p);if(pg)pg.classList.add("active");
+  document.querySelectorAll(".ni").forEach(function(x){if((x.getAttribute("onclick")||"").indexOf("G('"+p+"')")>=0)x.classList.add("active");});
+  E("page-title").textContent=TITLES[p]||p;
+  closeSB();
+  if(p==="dashboard")rDash();
+  else if(p==="membres")rMembres();
+  else if(p==="cotisations"){pSels();rCots();}
+  else if(p==="adhesion"){pSels();rAdh();}
+  else if(p==="retards"){pSels();rRets();}
+  else if(p==="amendes"){pSels();rAms();}
+  else if(p==="dons"){pSels2();rDons();}
+  else if(p==="prets"){pSels2();rPrets();}
+  else if(p==="pret-interet"){pSels2();rPI();}
+  else if(p==="fond-caisse")rFC();
+  else if(p==="fond-cotisation"){pSels2();rFK();}
+  else if(p==="reunions"){pReun();rReuns();}
+  else if(p==="comptabilite")initCompta();
+  else if(p==="alertes")rAlertes();
+  else if(p==="mon-compte"){pMC();rMC();}
+  else if(p==="configuration")loadConf();
+  else if(p==="superadmin")rSuperAdmin();
+}
+function pSels(){
+  var opts=MC.map(function(m){return '<option value="'+m.id+'">'+m.prenom+" "+m.nom+"</option>";}).join("");
+  ["cot-m","adh-m","ret-m","am-membre"].forEach(function(id){var e=E(id);if(e)e.innerHTML=opts;});
+  var e=E("cot-fm");if(e)e.innerHTML='<option value="">Tous les membres</option>'+opts;
+}
+function pSels2(){
+  var opts=MC.map(function(m){return '<option value="'+m.id+'">'+m.prenom+" "+m.nom+"</option>";}).join("");
+  ["don-benef","pret-benef","pi-benef","vir-membre"].forEach(function(id){var e=E(id);if(e)e.innerHTML=opts;});
+}
+function pMC(){
+  var opts='<option value="">-- Choisir --</option>'+MC.map(function(m){return '<option value="'+m.id+'">'+m.prenom+" "+m.nom+"</option>";}).join("");
+  var e=E("mc-select");if(e)e.innerHTML=opts;
+}
+window.addEventListener("DOMContentLoaded",function(){
+  E("topbar-date").textContent=new Date().toLocaleDateString("fr-FR",{weekday:"short",day:"numeric",month:"long",year:"numeric"});
+  ["cot-dt","ret-dt","am-dt","adh-dt","don-dt","pret-dt","pi-date","caisse-dt","vir-dt","reun-dt"].forEach(function(id){var e=E(id);if(e)e.value=td();});
+  var ae=E("adh-an");if(ae)ae.value=new Date().getFullYear();
+  var ce=E("cot-mo");if(ce)ce.value=td().slice(0,7);
+  var col=E("cf-col");
+  if(col)col.addEventListener("input",function(ev){var h=E("cf-col-hex");if(h)h.value=ev.target.value;document.documentElement.style.setProperty("--accent",ev.target.value);});
+  initSB(SB_URL,SB_KEY);
+});
+function loadSBScript(cb){
+  if(window.supabase){cb();return;}
+  var s=document.createElement("script");
+  s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+  s.onload=cb;s.onerror=function(){showSS("setup");};
+  document.head.appendChild(s);
+}
+function initSB(url,key){
+  loadSBScript(function(){
+    sb=window.supabase.createClient(url,key);
+    sb.auth.getSession().then(function(res){
+      if(res.data&&res.data.session){CU=res.data.session.user;chargeD().then(function(){showSS("app");rDash();});}
+      else{showSS("auth");}
+    }).catch(function(){showSS("setup");});
+    sb.auth.onAuthStateChange(function(event,session){
+      if(event==="SIGNED_IN"&&session&&!CU){CU=session.user;chargeD().then(function(){showSS("app");rDash();});}
+      else if(event==="SIGNED_OUT"){CU=null;CA=null;MC=[];FC={};showSS("auth");}
+    });
+  });
+}
+function chargeD(){
+  return sb.from("utilisateurs").select("*,associations(*)").eq("auth_user_id",CU.id).single().then(function(res){
+    if(res.data&&res.data.associations){CA=res.data.associations;updSB(res.data);return refreshCache();}
+    else{sH("page-dashboard",'<div style="max-width:500px;margin:60px auto;padding:20px"><div class="alert alert-error" style="margin-bottom:16px">Compte non configure. Votre compte nest pas lie a une association.</div><div class="card"><div class="card-title">Comment regler</div><p style="font-size:13px;color:var(--text2);margin-bottom:12px">Table Editor - table utilisateurs - verifiez association_id et auth_user_id</p><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Votre auth_user_id:</div><div style="background:var(--bg3);border-radius:8px;padding:10px;font-size:12px;font-family:monospace;word-break:break-all;color:var(--accent)">'+(CU?CU.id:"inconnu")+'</div></div></div>');}
+  });
+}
+function refreshCache(){
+  if(!CA)return Promise.resolve();
+  return sb.from("membres").select("*").eq("association_id",CA.id).order("nom").then(function(r){
+    MC=r.data||[];
+    return sb.from("fonds_adhesion").select("membre_id,solde").eq("association_id",CA.id);
+  }).then(function(r){
+    FC={};(r.data||[]).forEach(function(f){FC[f.membre_id]=+f.solde;});
+    sH("sb-count",""+MC.filter(function(m){return m.statut==="actif";}).length);
+  });
+}
+function updSB(ud){
+  checkSuperAdmin();
+  var nom=((ud.prenom||"")+" "+(ud.nom||"")).trim()||CU.email;
+  E("sb-nom").textContent=(CA&&CA.nom)||"Mboa";
+  E("sb-plan").textContent="Plan "+((CA&&CA.plan)||"gratuit");
+  if(E("sb-user"))E("sb-user").textContent=nom;
+  if(E("sb-role"))E("sb-role").textContent=ud.role||"Admin";
+  if(E("sb-av"))E("sb-av").textContent=nom.slice(0,2).toUpperCase();
+  applyConf();
+}
+function applyConf(){
+  if(!CA)return;
+  if(CA.couleur_accent)document.documentElement.style.setProperty("--accent",CA.couleur_accent);
+  var m={"cf-nom":"nom","cf-heure":"heure_reunion","cf-t1":"tranche1_max","cf-t2":"tranche2_max"};
+  Object.keys(m).forEach(function(k){var e=E(k);if(e&&CA[m[k]])e.value=CA[m[k]];});
+  function sv(id,v){var e=E(id);if(e&&v!=null)e.value=v;}
+  sv("cf-col",CA.couleur_accent||"#f5c842");sv("cf-col-hex",CA.couleur_accent||"#f5c842");
+  sv("cf-m1",CA.tranche1_montant||2.5);sv("cf-m2",CA.tranche2_montant||5);
+  sv("cf-am",CA.montant_amende_absence||15);sv("cf-nba",CA.nb_absences_avant_amende||3);
+  sv("cf-mr",CA.mois_reset||10);sv("cf-dr",CA.duree_remboursement_mois||3);
+}
+function doSetup(){
+  var url=gV("setup-url"),key=gV("setup-key");
+  if(!url||!key){showSUErr("Remplissez les deux champs.");return;}
+  if(url.indexOf("https://")!==0){showSUErr("URL doit commencer par https://");return;}
+  if(key.indexOf("eyJ")!==0){showSUErr("La cle commence par eyJ...");return;}
+  SB_URL=url;SB_KEY=key;
+  E("setup-err").classList.add("hidden");
+  initSB(url,key);
+}
+function showSUErr(msg){var e=E("setup-err");e.textContent=msg;e.classList.remove("hidden");}
+function resetSU(){if(!confirm("Changer les cles Supabase?"))return;location.reload();}
+function aTab(i){
+  document.querySelectorAll(".atab").forEach(function(t,j){t.classList.toggle("active",i===j);});
+  E("f-login").classList.toggle("hidden",i!==0);
+  E("f-register").classList.toggle("hidden",i!==1);
+  E("auth-msg").classList.add("hidden");
+}
+function showAM(msg,type){var e=E("auth-msg");e.className="al al-"+(type||"e");e.textContent=msg;e.classList.remove("hidden");}
+function doLogin(){
+  var email=gV("li-email"),pwd=E("li-pwd").value;
+  if(!email||!pwd){showAM("Remplissez email et mot de passe.");return;}
+  var btn=E("btn-li");btn.innerHTML='<span class="spin"></span>';btn.disabled=true;
+  sb.auth.signInWithPassword({email:email,password:pwd}).then(function(r){
+    btn.innerHTML="Se connecter";btn.disabled=false;
+    if(r.error)showAM(r.error.message.indexOf("Invalid")>=0?"Email ou mot de passe incorrect.":r.error.message);
+  });
+}
+function doRegister(){
+  var asso=gV("rg-asso"),prenom=gV("rg-prenom"),nom=gV("rg-nom"),email=gV("rg-email"),pwd=E("rg-pwd").value;
+  if(!asso||!prenom||!nom||!email||!pwd){showAM("Tous les champs sont requis.");return;}
+  if(pwd.length<8){showAM("Mot de passe: minimum 8 caracteres.");return;}
+  var btn=E("btn-rg");btn.innerHTML='<span class="spin"></span>';btn.disabled=true;
+  sb.auth.signUp({email:email,password:pwd}).then(function(r){
+    if(r.error){btn.innerHTML="Creer mon espace gratuit";btn.disabled=false;showAM(r.error.message);return;}
+    var slug=asso.toLowerCase().replace(/[^a-z0-9]+/g,"-").slice(0,40)+"-"+Date.now().toString(36);
+    sb.from("associations").insert({nom:asso,slug:slug}).select().single().then(function(ra){
+      if(ra.error){btn.innerHTML="Creer mon espace gratuit";btn.disabled=false;showAM("Erreur: "+ra.error.message);return;}
+      sb.from("utilisateurs").insert({association_id:ra.data.id,auth_user_id:r.data.user.id,email:email,prenom:prenom,nom:nom,role:"admin"}).then(function(){
+        btn.innerHTML="Creer mon espace gratuit";btn.disabled=false;
+        showAM("Compte cree! Verifiez votre email puis connectez-vous.","s");
+        setTimeout(function(){aTab(0);},3000);
+      });
+    });
+  });
+}
+function dofPwd(){var e=prompt("Votre email:");if(e){sb.auth.resetPasswordForEmail(e).then(function(){alert("Email envoye!");});}}
+function doLogout(){sb.auth.signOut();}
+function rDash(){
+  if(!CA)return;
+  refreshCache().then(function(){
+    var aid=CA.id,actifs=MC.filter(function(m){return m.statut==="actif";}).length;
+    var totalFonds=Object.values(FC).reduce(function(a,b){return a+b;},0);
+    var plan=(CA.plan)||"gratuit";
+    Promise.all([
+      sb.from("cotisations").select("montant,statut").eq("association_id",aid),
+      sb.from("retards").select("montant").eq("association_id",aid).eq("statut","impaye"),
+      sb.from("amendes").select("montant").eq("association_id",aid).eq("statut","impaye")
+    ]).then(function(rs){
+      var cots=rs[0].data||[],rets=rs[1].data||[],ams=rs[2].data||[];
+      var totC=cots.filter(function(c){return c.statut==="paye";}).reduce(function(s,c){return s+(+c.montant);},0);
+      var impC=cots.filter(function(c){return c.statut==="impaye";}).length;
+      var totR=rets.reduce(function(s,r){return s+(+r.montant);},0);
+      var totA=ams.reduce(function(s,a){return s+(+a.montant);},0);
+      sH("dash-warn",plan==="gratuit"&&actifs>=8?'<div class="alert alert-warning" style="margin-bottom:16px">Vous approchez la limite de 10 membres du plan gratuit.</div>':"");
+      sH("dash-stats",
+        '<div class="stat-card yellow"><div class="stat-label">Membres actifs</div><div class="stat-val">'+actifs+'</div><div class="stat-sub">'+MC.length+' au total</div></div>'+
+        '<div class="stat-card green"><div class="stat-label">Cotisations percues</div><div class="stat-val">'+fmt(totC)+' EUR</div><div class="stat-sub">'+impC+' impaye(s)</div></div>'+
+        '<div class="stat-card blue"><div class="stat-label">Fond adhesion total</div><div class="stat-val">'+fmt(totalFonds)+' EUR</div></div>'+
+        '<div class="stat-card red"><div class="stat-label">Plan</div><div class="stat-val" style="font-size:18px;padding-top:4px">'+plan.charAt(0).toUpperCase()+plan.slice(1)+'</div></div>'
+      );
+      var fh=MC.filter(function(m){return m.statut==="actif";}).map(function(m){
+        return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'+avEl(m.id)+'<div style="flex:1"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>'+m.prenom+" "+m.nom+'</span><span style="font-weight:500">'+fmt(FC[m.id]||0)+' EUR</span></div><div class="progress"><div class="progress-bar" style="width:'+Math.min(100,FC[m.id]||0)+'%;background:var(--accent)"></div></div></div></div>';
+      }).join("");
+      sH("dash-fonds",fh||'<div class="empty">Aucun membre actif</div>');
+      sH("dash-resume",
+        '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--text2)">Retards impayes</span><span style="font-weight:500;color:var(--red)">'+fmt(totR)+' EUR</span></div>'+
+        '<div style="display:flex;justify-content:space-between;padding:10px 0;font-size:13px"><span style="color:var(--text2)">Amendes impayees</span><span style="font-weight:500;color:var(--red)">'+fmt(totA)+' EUR</span></div>'
+      );
+    });
+  });
+}
+function rMembres(){
+  if(!CA)return;
+  refreshCache().then(function(){
+    pSels();
+    var h=MC.length?MC.map(function(m){
+      return "<tr><td>"+mChip(m.id)+"</td><td>"+( m.tel||"--")+"</td><td>"+(m.email||"--")+"</td>"+
+        '<td><span class="badge '+(m.statut==="actif"?"badge-green":"badge-gray")+'">'+(m.statut==="actif"?"Actif":"Inactif")+"</span></td>"+
+        '<td style="font-weight:500">'+fmt(FC[m.id]||0)+' EUR</td>'+
+        '<td style="display:flex;gap:5px"><button class="btn btn-s btn-sm" onclick="editM(\''+m.id+'\')">Modifier</button><button class="btn btn-d btn-sm" onclick="delM(\''+m.id+'\')">Suppr.</button></td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucun membre</div></td></tr>';
+    sH("m-tbody",h);
+  });
+}
+function openMM(){E("mm-titre").textContent="Nouveau membre";E("mm-id").value="";["mm-prenom","mm-nom","mm-tel","mm-email","mm-note"].forEach(function(id){E(id).value="";});E("mm-date").value=td();E("mm-statut").value="actif";openMO("modal-m");}
+function editM(id){
+  var m=MC.find(function(x){return x.id===id;});if(!m)return;
+  E("mm-titre").textContent="Modifier";E("mm-id").value=id;
+  E("mm-prenom").value=m.prenom||"";E("mm-nom").value=m.nom||"";E("mm-tel").value=m.tel||"";
+  E("mm-email").value=m.email||"";E("mm-date").value=m.date_adhesion||"";E("mm-statut").value=m.statut||"actif";E("mm-note").value=m.note||"";
+  openMO("modal-m");
+}
+function saveMembre(){
+  var prenom=gV("mm-prenom"),nom=gV("mm-nom");
+  if(!prenom||!nom){alert("Prenom et nom requis.");return;}
+  var id=E("mm-id").value;
+  var data={prenom:prenom,nom:nom,tel:gV("mm-tel")||null,email:gV("mm-email")||null,date_adhesion:E("mm-date").value||null,statut:E("mm-statut").value,note:gV("mm-note")||null};
+  var p;
+  if(id){p=sb.from("membres").update(data).eq("id",id);}
+  else{
+    if(((CA&&CA.plan)||"gratuit")==="gratuit"&&MC.length>=10){alert("Limite 10 membres. Upgradez votre plan.");return;}
+    p=sb.from("membres").insert(Object.assign({},data,{association_id:CA.id})).select().single().then(function(r){
+      if(r.data)return sb.from("fonds_adhesion").insert({association_id:CA.id,membre_id:r.data.id,solde:0});
+    });
+  }
+  p.then(function(){closeMO("modal-m");refreshCache().then(rMembres);});
+}
+function delM(id){if(!confirm("Supprimer ce membre?"))return;sb.from("membres").delete().eq("id",id).then(function(){refreshCache().then(rMembres);});}
+function rCots(){
+  if(!CA)return;
+  var fm=(E("cot-fm")||{}).value||"",fs=(E("cot-fs")||{}).value||"";
+  var q=sb.from("cotisations").select("*").eq("association_id",CA.id).order("mois",{ascending:false});
+  if(fm)q=q.eq("membre_id",fm);if(fs)q=q.eq("statut",fs);
+  q.then(function(r){
+    var data=r.data||[];
+    var tot=data.filter(function(c){return c.statut==="paye";}).reduce(function(s,c){return s+(+c.montant);},0);
+    var te=E("cot-total");if(te)te.textContent="Total percu: "+fmt(tot)+" EUR";
+    var h=data.length?data.map(function(c){
+      return "<tr><td>"+mChip(c.membre_id)+"</td><td>"+(c.mois||"--")+"</td><td>"+fmt(c.montant)+" EUR</td>"+
+        "<td>"+fdD(c.date_paiement)+"</td>"+
+        '<td><span class="badge '+(c.statut==="paye"?"badge-green":"badge-red")+'">'+(c.statut==="paye"?"Paye":"Impaye")+"</span></td>"+
+        '<td><button class="btn btn-d btn-sm" onclick="delCot(\''+c.id+'\')">Suppr.</button></td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucune cotisation</div></td></tr>';
+    sH("cot-tbody",h);
+  });
+}
+function addCot(){
+  var d={association_id:CA.id,membre_id:gV("cot-m"),mois:E("cot-mo").value,montant:+E("cot-mt").value,date_paiement:E("cot-dt").value||null,statut:E("cot-st").value,note:gV("cot-note")||null};
+  if(!d.membre_id||!d.mois||!d.montant){alert("Membre, mois et montant requis.");return;}
+  sb.from("cotisations").insert(d).then(function(){rCots();E("page-cotisations").querySelectorAll(".tab")[0].click();});
+}
+function delCot(id){if(!confirm("Supprimer?"))return;sb.from("cotisations").delete().eq("id",id).then(rCots);}
+function rAdh(){
+  if(!CA)return;
+  refreshCache().then(function(){
+    sH("adh-fonds-tb",MC.map(function(m){return "<tr><td>"+mChip(m.id)+'</td><td style="font-weight:600;font-size:15px">'+fmt(FC[m.id]||0)+" EUR</td></tr>";}).join('')||'<tr><td colspan="2"><div class="empty">Aucun membre</div></td></tr>');
+    sb.from("adhesions").select("*").eq("association_id",CA.id).order("annee",{ascending:false}).then(function(r){
+      var data=r.data||[];
+      sH("adh-tb",data.length?data.map(function(a){return "<tr><td>"+mChip(a.membre_id)+"</td><td>"+a.annee+"</td><td>"+fmt(a.montant)+" EUR</td><td>"+fdD(a.date_paiement)+"</td><td><span class=\"badge "+(a.statut==="paye"?"badge-green":"badge-red")+'">'+(a.statut==="paye"?"Paye":"Impaye")+"</span></td></tr>";}).join(''):'<tr><td colspan="5"><div class="empty">Aucun paiement</div></td></tr>');
+    });
+  });
+}
+function addAdh(){
+  var mid=gV("adh-m"),mt=+E("adh-mt").value,st=E("adh-st").value;
+  if(!mid||!mt){alert("Membre et montant requis.");return;}
+  sb.from("adhesions").insert({association_id:CA.id,membre_id:mid,annee:+E("adh-an").value,montant:mt,date_paiement:E("adh-dt").value||null,statut:st}).then(function(){
+    if(st==="paye"){var nv=(FC[mid]||0)+mt;sb.from("fonds_adhesion").upsert({association_id:CA.id,membre_id:mid,solde:nv},{onConflict:"association_id,membre_id"}).then(function(){FC[mid]=nv;rAdh();});}
+    else rAdh();
+    E("page-adhesion").querySelectorAll(".tab")[0].click();
+  });
+}
+function rRets(){
+  if(!CA)return;
+  sb.from("retards").select("*").eq("association_id",CA.id).order("date_infraction",{ascending:false}).then(function(r){
+    var data=r.data||[];
+    sH("ret-tbody",data.length?data.map(function(r2){
+      return "<tr><td>"+mChip(r2.membre_id)+"</td><td>"+(r2.motif||"--")+"</td><td>"+fmt(r2.montant)+" EUR</td><td>"+fdD(r2.date_infraction)+"</td>"+
+        '<td><span class="badge '+(r2.statut==="paye"?"badge-green":"badge-red")+'">'+(r2.statut==="paye"?"Paye":"Impaye")+"</span></td>"+
+        '<td style="display:flex;gap:5px">'+(r2.statut==="impaye"?'<button class="btn btn-s btn-sm" style="color:var(--green)" onclick="payI(\'retards\',\''+r2.id+'\')">Paye</button>':"")+
+        '<button class="btn btn-d btn-sm" onclick="delI(\'retards\',\''+r2.id+'\',rRets)">Suppr.</button></td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucun retard</div></td></tr>');
+  });
+}
+function addRet(){
+  var d={association_id:CA.id,membre_id:gV("ret-m"),motif:gV("ret-mo")||null,montant:+E("ret-mt").value,date_infraction:E("ret-dt").value||null,statut:"impaye"};
+  if(!d.membre_id||!d.montant){alert("Membre et montant requis.");return;}
+  sb.from("retards").insert(d).then(function(){rRets();E("page-retards").querySelectorAll(".tab")[0].click();});
+}
+function rAms(){
+  if(!CA)return;
+  sb.from("amendes").select("*").eq("association_id",CA.id).order("date_infraction",{ascending:false}).then(function(r){
+    var data=r.data||[];
+    sH("am-tbody",data.length?data.map(function(a){
+      return "<tr><td>"+mChip(a.membre_id)+"</td><td>"+(a.motif||"--")+"</td><td>"+fmt(a.montant)+" EUR</td><td>"+fdD(a.date_infraction)+"</td>"+
+        '<td><span class="badge '+(a.statut==="paye"?"badge-green":"badge-red")+'">'+(a.statut==="paye"?"Paye":"Impaye")+"</span></td>"+
+        '<td style="display:flex;gap:5px">'+(a.statut==="impaye"?'<button class="btn btn-s btn-sm" style="color:var(--green)" onclick="payI(\'amendes\',\''+a.id+'\')">Paye</button>':"")+
+        '<button class="btn btn-d btn-sm" onclick="delI(\'amendes\',\''+a.id+'\',rAms)">Suppr.</button></td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucune amende</div></td></tr>');
+  });
+}
+function addAm(){
+  var d={association_id:CA.id,membre_id:gV("am-membre"),motif:gV("am-mo")||null,montant:+E("am-mt").value,date_infraction:E("am-dt").value||null,statut:"impaye"};
+  if(!d.membre_id||!d.montant){alert("Membre et montant requis.");return;}
+  sb.from("amendes").insert(d).then(function(){rAms();E("page-amendes").querySelectorAll(".tab")[0].click();});
+}
+function payI(table,id){E("pay-tb").value=table;E("pay-id").value=id;E("pay-dt").value=td();openMO("modal-pay");}
+function confirmPay(){
+  var tb=E("pay-tb").value,id=E("pay-id").value,dt=E("pay-dt").value;
+  sb.from(tb).update({statut:"paye",date_paiement:dt}).eq("id",id).then(function(){closeMO("modal-pay");if(tb==="retards")rRets();else rAms();});
+}
+function delI(table,id,fn){if(!confirm("Supprimer?"))return;sb.from(table).delete().eq("id",id).then(fn);}
+function prvDon(){
+  var mt=+(E("don-mt")||{}).value||0,benef=(E("don-benef")||{}).value;
+  var contrib=MC.filter(function(m){return m.statut==="actif"&&m.id!==benef;});
+  if(!mt||!contrib.length){sH("don-preview","");return;}
+  var part=+(mt/contrib.length).toFixed(2);
+  sH("don-preview",'<div class="alert alert-info">'+contrib.length+" membre(s) contribuent chacun <strong>"+fmt(part)+" EUR</strong> -- delai: "+dRemb()+" mois.</div>");
+}
+function rDons(){
+  if(!CA)return;
+  Promise.all([sb.from("dons").select("*").eq("association_id",CA.id).order("date_don",{ascending:false}),sb.from("remboursements").select("*").eq("association_id",CA.id).eq("type","don")]).then(function(rs){
+    var dons=rs[0].data||[],rembs=rs[1].data||[];
+    var rMap={};rembs.forEach(function(r){if(!rMap[r.reference_id])rMap[r.reference_id]=[];rMap[r.reference_id].push(r);});
+    sH("don-tbody",dons.length?dons.map(function(d){
+      var rs2=rMap[d.id]||[],payes=rs2.filter(function(r){return r.statut==="paye";}).length;
+      var pct=rs2.length?Math.round(payes/rs2.length*100):0;
+      return "<tr><td>"+mChip(d.beneficiaire_id)+"</td><td>"+fmt(d.montant)+" EUR</td><td>"+fdD(d.date_don)+"</td><td>"+(d.motif||"--")+"</td>"+
+        '<td><div style="display:flex;align-items:center;gap:8px;min-width:100px"><div class="progress" style="flex:1"><div class="progress-bar" style="width:'+pct+'%"></div></div><span style="font-size:11px;color:var(--text3)">'+payes+"/"+rs2.length+"</span></div></td>"+
+        '<td><button class="btn btn-d btn-sm" onclick="delDon(\''+d.id+'\')">Suppr.</button></td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucun don</div></td></tr>');
+    sH("don-remb-tbody",rembs.length?rembs.map(function(r){
+      var don=dons.find(function(d){return d.id===r.reference_id;});
+      var ov=r.statut==="en attente"&&r.echeance<td();
+      return "<tr><td>"+(don?mNm(don.beneficiaire_id)+" ("+fmt(don.montant)+"EUR)":"--")+"</td><td>"+mChip(r.membre_id)+"</td><td>"+fmt(r.montant)+" EUR</td>"+
+        '<td style="color:'+(ov?"var(--red)":"var(--text)")+'">'+fdD(r.echeance)+"</td>"+
+        '<td><span class="badge '+(r.statut==="paye"?"badge-green":ov?"badge-red":"badge-yellow")+'">'+(r.statut==="paye"?"Paye":ov?"En retard":"En attente")+"</span></td>"+
+        "<td>"+(r.statut==="en attente"?'<button class="btn btn-s btn-sm" style="color:var(--green)" onclick="payRemb(\''+r.id+'\')">Paye</button>':"--")+"</td></tr>";
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucun remboursement</div></td></tr>');
+  });
+}
+function addDon(){
+  var benefId=gV("don-benef"),montant=+E("don-mt").value,date=E("don-dt").value,motif=gV("don-mo");
+  if(!benefId||!montant||!date){alert("Remplissez tous les champs.");return;}
+  var actifs=MC.filter(function(m){return m.statut==="actif";});
+  var contrib=actifs.filter(function(m){return m.id!==benefId;});
+  if(!contrib.length){alert("Pas assez de membres actifs.");return;}
+  var part=+(montant/contrib.length).toFixed(2),echeance=addM(date,dRemb());
+  sb.from("dons").insert({association_id:CA.id,beneficiaire_id:benefId,montant:montant,date_don:date,motif:motif||null}).select().single().then(function(r){
+    if(r.error){alert("Erreur: "+r.error.message);return;}
+    var rembs=contrib.map(function(m){return{association_id:CA.id,membre_id:m.id,type:"don",reference_id:r.data.id,montant:part,echeance:echeance,statut:"en attente"};});
+    sb.from("remboursements").insert(rembs).then(function(){
+      var ps=contrib.map(function(m){var nv=Math.max(0,(FC[m.id]||0)-part);FC[m.id]=nv;return sb.from("fonds_adhesion").upsert({association_id:CA.id,membre_id:m.id,solde:nv},{onConflict:"association_id,membre_id"});});
+      Promise.all(ps).then(function(){E("don-mt").value="";sH("don-preview","");rDons();E("page-dons").querySelectorAll(".tab")[0].click();});
+    });
+  });
+}
+function delDon(id){
+  if(!confirm("Supprimer ce don?"))return;
+  sb.from("remboursements").select("*").eq("reference_id",id).eq("statut","en attente").then(function(r){
+    var ps=(r.data||[]).map(function(rem){var nv=(FC[rem.membre_id]||0)+rem.montant;FC[rem.membre_id]=nv;return sb.from("fonds_adhesion").upsert({association_id:CA.id,membre_id:rem.membre_id,solde:nv},{onConflict:"association_id,membre_id"});});
+    Promise.all(ps).then(function(){sb.from("remboursements").delete().eq("reference_id",id).then(function(){sb.from("dons").delete().eq("id",id).then(rDons);});});
+  });
+}
+function payRemb(id){
+  sb.from("remboursements").update({statut:"paye",date_paiement:td()}).eq("id",id).then(function(){
+    sb.from("remboursements").select("*").eq("id",id).single().then(function(r){
+      if(r.data&&r.data.type==="don"){var nv=(FC[r.data.membre_id]||0)+r.data.montant;sb.from("fonds_adhesion").upsert({association_id:CA.id,membre_id:r.data.membre_id,solde:nv},{onConflict:"association_id,membre_id"}).then(function(){FC[r.data.membre_id]=nv;rDons();rPrets();});}
+      else{rDons();rPrets();}
+    });
+  });
+}
+function prvPret(){
+  var mt=+(E("pret-mt")||{}).value||0,actifs=MC.filter(function(m){return m.statut==="actif";});
+  if(!mt||!actifs.length){sH("pret-preview","");return;}
+  sH("pret-preview",'<div class="alert alert-info">'+actifs.length+" membres contribuent chacun <strong>"+fmt(+(mt/actifs.length).toFixed(2))+" EUR</strong> -- delai: "+dRemb()+" mois.</div>");
+}
+function rPrets(){
+  if(!CA)return;
+  Promise.all([sb.from("prets").select("*").eq("association_id",CA.id).order("date_pret",{ascending:false}),sb.from("remboursements").select("*").eq("association_id",CA.id).eq("type","pret")]).then(function(rs){
+    var prets=rs[0].data||[],rembs=rs[1].data||[];
+    var rMap={};rembs.forEach(function(r){if(!rMap[r.reference_id])rMap[r.reference_id]=[];rMap[r.reference_id].push(r);});
+    sH("pret-tbody",prets.length?prets.map(function(p){
+      var rs2=rMap[p.id]||[],payes=rs2.filter(function(r){return r.statut==="paye";}).length;
+      var pct=rs2.length?Math.round(payes/rs2.length*100):0;
+      return "<tr><td>"+mChip(p.beneficiaire_id)+"</td><td>"+fmt(p.montant)+" EUR</td><td>"+fdD(p.date_pret)+"</td><td>"+(p.motif||"--")+"</td>"+
+        '<td><div style="display:flex;align-items:center;gap:8px;min-width:100px"><div class="progress" style="flex:1"><div class="progress-bar" style="width:'+pct+'%;background:var(--blue)"></div></div><span style="font-size:11px;color:var(--text3)">'+payes+"/"+rs2.length+"</span></div></td>"+
+        '<td><button class="btn btn-d btn-sm" onclick="delPret(\''+p.id+'\')">Suppr.</button></td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucun pret</div></td></tr>');
+    sH("pret-remb-tbody",rembs.length?rembs.map(function(r){
+      var pret=prets.find(function(p){return p.id===r.reference_id;});
+      var ov=r.statut==="en attente"&&r.echeance<td();
+      return "<tr><td>"+(pret?mNm(pret.beneficiaire_id)+" ("+fmt(pret.montant)+"EUR)":"--")+"</td><td>"+mChip(r.membre_id)+"</td><td>"+fmt(r.montant)+" EUR</td>"+
+        '<td style="color:'+(ov?"var(--red)":"var(--text)")+'">'+fdD(r.echeance)+"</td>"+
+        '<td><span class="badge '+(r.statut==="paye"?"badge-green":ov?"badge-red":"badge-yellow")+'">'+(r.statut==="paye"?"Paye":ov?"En retard":"En attente")+"</span></td>"+
+        "<td>"+(r.statut==="en attente"?'<button class="btn btn-s btn-sm" style="color:var(--green)" onclick="payRemb(\''+r.id+'\')">Paye</button>':"--")+"</td></tr>";
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucun remboursement</div></td></tr>');
+  });
+}
+function addPret(){
+  var benefId=gV("pret-benef"),montant=+E("pret-mt").value,date=E("pret-dt").value,motif=gV("pret-mo");
+  if(!benefId||!montant||!date){alert("Remplissez tous les champs.");return;}
+  var actifs=MC.filter(function(m){return m.statut==="actif";});
+  if(!actifs.length){alert("Pas de membres actifs.");return;}
+  var part=+(montant/actifs.length).toFixed(2),echeance=addM(date,dRemb());
+  sb.from("prets").insert({association_id:CA.id,beneficiaire_id:benefId,montant:montant,date_pret:date,motif:motif||null}).select().single().then(function(r){
+    if(r.error){alert("Erreur: "+r.error.message);return;}
+    var rembs=actifs.map(function(m){return{association_id:CA.id,membre_id:m.id,type:"pret",reference_id:r.data.id,montant:part,echeance:echeance,statut:"en attente"};});
+    sb.from("remboursements").insert(rembs).then(function(){E("pret-mt").value="";sH("pret-preview","");rPrets();E("page-prets").querySelectorAll(".tab")[0].click();});
+  });
+}
+function delPret(id){if(!confirm("Supprimer?"))return;sb.from("remboursements").delete().eq("reference_id",id).then(function(){sb.from("prets").delete().eq("id",id).then(rPrets);});}
+function calcInt(cap,type,taux,dur){
+  var c=+cap,t=+taux,d=+dur;
+  if(type==="annuel")return +(c*(t/100)*(d/12)).toFixed(2);
+  if(type==="mensuel")return +(c*(t/100)*d).toFixed(2);
+  return +t.toFixed(2);
+}
+function prvPI(){
+  var cap=+(E("pi-capital")||{}).value||0,dur=+(E("pi-duree")||{}).value||1;
+  var type=(E("pi-type-taux")||{}).value||"annuel",taux=+(E("pi-taux")||{}).value||0;
+  var tl=E("pi-taux-label");if(tl)tl.textContent=type==="annuel"?"Taux annuel (%)":type==="mensuel"?"Taux mensuel (%)":"Montant interets (EUR)";
+  if(!cap){sH("pi-preview","");return;}
+  var int2=calcInt(cap,type,taux,dur),tot=+(cap+int2).toFixed(2),mens=+(tot/dur).toFixed(2);
+  sH("pi-preview",'<div class="alert alert-info"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:12px;margin-bottom:8px"><div><div style="font-size:11px;color:var(--text3)">Capital</div><div style="font-weight:600;font-size:16px">'+fmt(cap)+' EUR</div></div><div><div style="font-size:11px;color:var(--text3)">Interets</div><div style="font-weight:600;font-size:16px;color:var(--accent)">'+fmt(int2)+' EUR</div></div><div><div style="font-size:11px;color:var(--text3)">Total du</div><div style="font-weight:600;font-size:16px;color:var(--red)">'+fmt(tot)+' EUR</div></div><div><div style="font-size:11px;color:var(--text3)">Mensualite</div><div style="font-weight:600;font-size:16px">'+fmt(mens)+' EUR</div></div></div><div style="font-size:12px;color:var(--text2)">Duree: <strong>'+dur+' mois</strong></div></div>');
+}
+function rPI(){
+  if(!CA)return;
+  sb.from("prets_interets").select("*").eq("association_id",CA.id).order("date_octroi",{ascending:false}).then(function(r){
+    var prets=r.data||[];
+    sH("pi-tbody",prets.length?prets.map(function(p){
+      var sb2=p.statut==="rembourse"?"badge-green":p.statut==="en retard"?"badge-red":"badge-yellow";
+      return "<tr><td>"+mChip(p.beneficiaire_id)+"</td><td>"+fmt(p.capital)+" EUR</td><td style=\"color:var(--accent)\">"+fmt(p.interets)+" EUR</td><td style=\"font-weight:600;color:var(--red)\">"+fmt(p.total_du)+" EUR</td>"+
+        '<td><span class="badge '+(p.fond==="caisse"?"badge-gray":"badge-blue")+'">'+(p.fond==="caisse"?"Caisse":"Adhesion")+"</span></td>"+
+        "<td>"+p.duree_mois+" mois</td>"+
+        '<td><span class="badge '+sb2+'">'+(p.statut==="rembourse"?"Rembourse":p.statut==="en retard"?"En retard":"En cours")+"</span></td>"+
+        '<td style="display:flex;gap:5px">'+(p.statut==="en cours"?'<button class="btn btn-s btn-sm" style="color:var(--green)" onclick="mrkPI(\''+p.id+'\')">Rembourse</button>':"")+
+        '<button class="btn btn-d btn-sm" onclick="delPI(\''+p.id+'\')">Suppr.</button></td></tr>';
+    }).join(''):'<tr><td colspan="8"><div class="empty">Aucun pret avec interets</div></td></tr>');
+    sH("pi-remb-tbody",prets.filter(function(p){return p.statut==="en cours";}).map(function(p){
+      var mens=+(p.total_du/p.duree_mois).toFixed(2),ov=new Date(p.date_echeance)<new Date();
+      return "<tr><td>"+mNm(p.beneficiaire_id)+"</td><td>"+fmt(mens)+" EUR</td><td style=\"color:"+(ov?"var(--red)":"var(--text)")+"\">"+fdD(p.date_echeance)+"</td><td>"+fmt(p.capital)+" EUR</td><td style=\"color:var(--accent)\">"+fmt(p.interets)+" EUR</td>"+
+        '<td><span class="badge '+(ov?"badge-red":"badge-yellow")+'">'+(ov?"En retard":"En cours")+"</span></td>"+
+        "<td>"+(ov?'<button class="btn btn-s btn-sm" style="color:var(--green)" onclick="mrkPI(\''+p.id+'\')">Cloturer</button>':"--")+"</td></tr>";
+    }).join('')||'<tr><td colspan="7"><div class="empty">Aucun pret en cours</div></td></tr>');
+  }).catch(function(){sH("pi-tbody",'<tr><td colspan="8"><div class="alert alert-error">Table prets_interets introuvable. Creez-la via SQL Editor dans Supabase.</div></td></tr>');});
+}
+function addPI(){
+  var benefId=gV("pi-benef"),cap=+E("pi-capital").value,date=E("pi-date").value,dur=+E("pi-duree").value;
+  var type=(E("pi-type-taux")||{}).value||"annuel",taux=+E("pi-taux").value,fond=(E("pi-fond")||{}).value||"caisse",motif=gV("pi-motif");
+  if(!benefId||!cap||!date||!dur){alert("Remplissez tous les champs.");return;}
+  var int2=calcInt(cap,type,taux,dur),tot=+(cap+int2).toFixed(2),ech=addM(date,dur);
+  sb.from("prets_interets").insert({association_id:CA.id,beneficiaire_id:benefId,capital:cap,interets:int2,total_du:tot,type_taux:type,taux:taux,duree_mois:dur,date_octroi:date,date_echeance:ech,fond:fond,motif:motif||null,statut:"en cours"}).then(function(r){
+    if(r.error){alert("Erreur: "+r.error.message+"\n\nCreez la table prets_interets dans Supabase SQL Editor.");return;}
+    E("pi-capital").value="";E("pi-taux").value="";sH("pi-preview","");rPI();E("page-pret-interet").querySelectorAll(".tab")[0].click();
+  });
+}
+function mrkPI(id){if(!confirm("Marquer comme rembourse?"))return;sb.from("prets_interets").update({statut:"rembourse"}).eq("id",id).then(rPI);}
+function delPI(id){if(!confirm("Supprimer?"))return;sb.from("prets_interets").delete().eq("id",id).then(rPI);}
+function rFC(){
+  if(!CA)return;
+  var aid=CA.id;
+  Promise.all([sb.from("retards").select("montant,membre_id,motif,date_paiement").eq("association_id",aid).eq("statut","paye"),sb.from("amendes").select("montant,membre_id,motif,date_paiement").eq("association_id",aid).eq("statut","paye"),sb.from("sorties_caisse").select("*").eq("association_id",aid).order("date_sortie")]).then(function(rs){
+    var entries=[];
+    (rs[0].data||[]).forEach(function(r){entries.push({date:r.date_paiement,type:"Retard",mid:r.membre_id,desc:r.motif||"Retard",e:+r.montant,s:0});});
+    (rs[1].data||[]).forEach(function(a){entries.push({date:a.date_paiement,type:"Amende",mid:a.membre_id,desc:a.motif||"Amende",e:+a.montant,s:0});});
+    (rs[2].data||[]).forEach(function(so){entries.push({date:so.date_sortie,type:"Sortie",mid:null,desc:so.description,e:0,s:+so.montant});});
+    entries.sort(function(a,b){return (a.date||"").localeCompare(b.date||"");});
+    var totE=entries.reduce(function(s,e){return s+e.e;},0),totS=entries.reduce(function(s,e){return s+e.s;},0);
+    sH("caisse-stats",'<div class="stat-card green"><div class="stat-label">Total entrees</div><div class="stat-val">'+fmt(totE)+' EUR</div></div><div class="stat-card red"><div class="stat-label">Total sorties</div><div class="stat-val">'+fmt(totS)+' EUR</div></div><div class="sc '+(totE-totS>=0?"y":"r")+'"><div class="stat-label">Solde caisse</div><div class="stat-val">'+fmt(totE-totS)+' EUR</div></div>');
+    var BADGE={Retard:"badge-red",Amende:"badge-red",Sortie:"badge-gray"};
+    var run=0;
+    sH("caisse-tbody",entries.length?entries.map(function(en){run+=en.e-en.s;
+      return "<tr><td>"+fdD(en.date)+"</td><td><span class=\"badge "+(BADGE[en.type]||"badge-gray")+'">'+en.type+"</span></td><td>"+(en.mid?mChip(en.mid):"--")+"</td><td>"+en.desc+"</td>"+
+        '<td style="color:var(--green)">'+(en.e?fmt(en.e)+" EUR":"--")+"</td><td style=\"color:var(--red)\">"+(en.s?fmt(en.s)+" EUR":"--")+"</td>"+
+        '<td style="font-weight:500;color:'+(run>=0?"var(--green)":"var(--red)")+'">'+fmt(run)+" EUR</td></tr>";
+    }).join(''):'<tr><td colspan="7"><div class="empty">Aucune operation</div></td></tr>');
+  });
+}
+function addFC(){
+  var desc=gV("caisse-desc"),mt=+E("caisse-mt").value,date=E("caisse-dt").value;
+  if(!desc||!mt||!date){alert("Remplissez tous les champs.");return;}
+  sb.from("sorties_caisse").insert({association_id:CA.id,description:desc,montant:mt,date_sortie:date}).then(function(){E("caisse-desc").value="";E("caisse-mt").value="";rFC();E("page-fond-caisse").querySelectorAll(".tab")[0].click();});
+}
+function rFK(){
+  if(!CA)return;
+  var aid=CA.id;
+  Promise.all([sb.from("cotisations").select("montant,membre_id,mois,date_paiement").eq("association_id",aid).eq("statut","paye"),sb.from("virements_cotisation").select("*").eq("association_id",aid).order("date_virement")]).then(function(rs){
+    var entries=[];
+    (rs[0].data||[]).forEach(function(c){entries.push({date:c.date_paiement,type:"Cotisation",mid:c.membre_id,desc:"Cotisation "+(c.mois||""),e:+c.montant,s:0});});
+    (rs[1].data||[]).forEach(function(v){entries.push({date:v.date_virement,type:"Virement",mid:v.membre_id,desc:v.motif||"Virement",e:0,s:+v.montant});});
+    entries.sort(function(a,b){return (a.date||"").localeCompare(b.date||"");});
+    var totE=entries.reduce(function(s,e){return s+e.e;},0),totS=entries.reduce(function(s,e){return s+e.s;},0),solde=totE-totS;
+    sH("fondcot-stats",'<div class="stat-card green"><div class="stat-label">Total cotisations</div><div class="stat-val">'+fmt(totE)+' EUR</div></div><div class="stat-card red"><div class="stat-label">Total virements</div><div class="stat-val">'+fmt(totS)+' EUR</div></div><div class="sc '+(solde>=0?"b":"r")+'"><div class="stat-label">Solde fond cotisation</div><div class="stat-val">'+fmt(solde)+' EUR</div></div>');
+    var sv=E("vir-solde");if(sv)sv.innerHTML='<div class="alert alert-warning" style="margin-top:10px">Solde disponible: <strong>'+fmt(Math.max(0,solde))+" EUR</strong></div>";
+    var BADGE={Cotisation:"badge-yellow",Virement:"badge-blue"};
+    var run=0;
+    sH("fondcot-tbody",entries.length?entries.map(function(en){run+=en.e-en.s;
+      return "<tr><td>"+fdD(en.date)+"</td><td><span class=\"badge "+(BADGE[en.type]||"badge-gray")+'">'+en.type+"</span></td><td>"+(en.mid?mChip(en.mid):"--")+"</td><td>"+en.desc+"</td>"+
+        '<td style="color:var(--green)">'+(en.e?fmt(en.e)+" EUR":"--")+"</td><td style=\"color:var(--red)\">"+(en.s?fmt(en.s)+" EUR":"--")+"</td>"+
+        '<td style="font-weight:500;color:'+(run>=0?"var(--green)":"var(--red)")+'">'+fmt(run)+" EUR</td></tr>";
+    }).join(''):'<tr><td colspan="7"><div class="empty">Aucune operation</div></td></tr>');
+  });
+}
+function addVir(){
+  var mid=gV("vir-membre"),mt=+E("vir-mt").value,date=E("vir-dt").value,motif=gV("vir-mo");
+  if(!mid||!mt||!date){alert("Remplissez tous les champs.");return;}
+  sb.from("virements_cotisation").insert({association_id:CA.id,membre_id:mid,montant:mt,date_virement:date,motif:motif||null}).then(function(){rFK();E("page-fond-cotisation").querySelectorAll(".tab")[0].click();});
+}
+function mRetard(heure){
+  if(!heure)return 0;
+  var parts=heure.split(":"),h=+parts[0],m=+parts[1],mins=h*60+m;
+  var t1=(CA&&CA.heure_reunion)||"17:30",t2=(CA&&CA.tranche1_max)||"18:00",t3=(CA&&CA.tranche2_max)||"19:00";
+  var p1=t1.split(":"),t1m=+p1[0]*60+(+p1[1]);
+  var p2=t2.split(":"),t2m=+p2[0]*60+(+p2[1]);
+  var p3=t3.split(":"),t3m=+p3[0]*60+(+p3[1]);
+  if(mins<t1m)return 0;if(mins<t2m)return (CA&&CA.tranche1_montant)||2.5;if(mins<t3m)return (CA&&CA.tranche2_montant)||5;return 0;
+}
+function nbAbsSaison(mid,reuns,excl){
+  var deb=debut();
+  return reuns.filter(function(r){return r.id!==excl&&(r.absents||[]).indexOf(mid)>=0&&r.date_reunion>=deb;}).length;
+}
+function pReun(){
+  var heure=(CA&&CA.heure_reunion)||"17:30";
+  var infoEl=E("reun-saison-info");
+  if(infoEl)infoEl.textContent="Heure fixee: "+heure+" | Tranche 1: "+fmt((CA&&CA.tranche1_montant)||2.5)+" EUR | Tranche 2: "+fmt((CA&&CA.tranche2_montant)||5)+" EUR | Amende: "+fmt((CA&&CA.montant_amende_absence)||15)+" EUR apres "+((CA&&CA.nb_absences_avant_amende)||3)+" absences";
+  var dt=E("reun-dt");if(dt)dt.value=td();
+  var grid=E("reun-presences");if(!grid)return;
+  var actifs=MC.filter(function(m){return m.statut==="actif";});
+  grid.innerHTML=actifs.map(function(m){
+    return '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
+      avEl(m.id)+'<span style="font-size:13px;font-weight:500;min-width:120px">'+m.prenom+" "+m.nom+"</span>"+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;flex:1">'+
+      '<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg2)"><input type="radio" name="rp-'+m.id+'" value="heure" checked onchange="upRP(\''+m.id+'\')"> A l\'heure</label>'+
+      '<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg2)"><input type="radio" name="rp-'+m.id+'" value="retard" onchange="upRP(\''+m.id+'\')"> Retard</label>'+
+      '<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg2)"><input type="radio" name="rp-'+m.id+'" value="absent" onchange="upRP(\''+m.id+'\')"> Absent</label>'+
+      '</div>'+
+      '<div id="rh-'+m.id+'" style="display:none;align-items:center;gap:6px">'+
+      '<label style="font-size:11px;color:var(--text3)">Heure:</label>'+
+      '<input type="time" id="rht-'+m.id+'" value="'+heure+'" onchange="upRP(\''+m.id+'\')" style="width:90px">'+
+      '<span id="rhm-'+m.id+'" style="font-size:12px;color:var(--accent);font-weight:600"></span>'+
+      '</div></div>';
+  }).join("");
+}
+function upRP(mid){
+  var radioEl=document.querySelector('input[name="rp-'+mid+'"]:checked');
+  var val=radioEl?radioEl.value:"heure";
+  var div=E("rh-"+mid);
+  if(val==="retard"){
+    if(div)div.style.display="flex";
+    var ht=E("rht-"+mid);var mt=ht?mRetard(ht.value):0;
+    var mEl=E("rhm-"+mid);if(mEl)mEl.textContent=mt>0?("-> "+fmt(mt)+" EUR"):"";
+  }else{if(div)div.style.display="none";}
+}
+function saveReun(){
+  var titre=gV("reun-titre"),date=E("reun-dt").value,lieu=gV("reun-lieu"),notes=gV("reun-notes");
+  if(!titre||!date){alert("Titre et date requis.");return;}
+  var actifs=MC.filter(function(m){return m.statut==="actif";});
+  var presents=[],retards_list=[],absents=[];
+  actifs.forEach(function(m){
+    var radioEl=document.querySelector('input[name="rp-'+m.id+'"]:checked');
+    var val=radioEl?radioEl.value:"heure";
+    if(val==="absent"){absents.push(m.id);}
+    else if(val==="retard"){var ht=E("rht-"+m.id);var heure=ht?ht.value:((CA&&CA.heure_reunion)||"17:30");retards_list.push({membreId:m.id,heure:heure,montant:mRetard(heure)});presents.push(m.id);}
+    else{presents.push(m.id);}
+  });
+  sb.from("reunions").insert({association_id:CA.id,titre:titre,date_reunion:date,lieu:lieu||null,notes:notes||null,presents:presents,absents:absents,retards_list:retards_list}).select().single().then(function(r){
+    if(r.error){alert("Erreur: "+r.error.message);return;}
+    var reun=r.data;
+    var retsData=retards_list.filter(function(r2){return r2.montant>0;}).map(function(r2){return{association_id:CA.id,membre_id:r2.membreId,motif:"Retard reunion: "+titre+" ("+r2.heure+")",montant:r2.montant,date_infraction:date,statut:"impaye",source:"reunion",reunion_id:reun.id};});
+    var p=retsData.length?sb.from("retards").insert(retsData):Promise.resolve();
+    p.then(function(){
+      sb.from("reunions").select("id,absents,date_reunion").eq("association_id",CA.id).then(function(ra){
+        var allR=ra.data||[];
+        var nbS=(CA&&CA.nb_absences_avant_amende)||3,montAm=(CA&&CA.montant_amende_absence)||15;
+        var amData=[];
+        absents.forEach(function(mid){
+          var nbAv=nbAbsSaison(mid,allR,reun.id);
+          if(nbAv+1>=nbS)amData.push({association_id:CA.id,membre_id:mid,motif:"Amende absence ("+(nbAv+1)+"e saison "+saison()+") -- "+titre,montant:montAm,date_infraction:date,statut:"impaye",source:"reunion",reunion_id:reun.id});
+        });
+        var p2=amData.length?sb.from("amendes").insert(amData):Promise.resolve();
+        p2.then(function(){E("reun-titre").value="";E("reun-notes").value="";rReuns();E("page-reunions").querySelectorAll(".tab")[0].click();});
+      });
+    });
+  });
+}
+function rReuns(){
+  if(!CA)return;
+  var sai=saison(),deb=debut(),nxt=ds2(sai);
+  var infoEl=E("reun-saison-info");if(infoEl)infoEl.textContent="Saison "+sai+" -- Depuis le "+fdD(deb)+" -- Prochain reset: "+fdD(nxt);
+  sb.from("reunions").select("*").eq("association_id",CA.id).order("date_reunion",{ascending:false}).then(function(r){
+    var reuns=r.data||[];
+    sH("reun-tbody",reuns.length?reuns.map(function(ru){
+      var aH=(ru.presents||[]).filter(function(id){return !(ru.retards_list||[]).find(function(x){return x.membreId===id&&x.montant>0;});});
+      var enR=(ru.retards_list||[]).filter(function(x){return x.montant>0;});
+      return "<tr><td>"+fdD(ru.date_reunion)+"</td><td>"+ru.titre+"</td>"+
+        "<td><div style=\"display:flex;flex-wrap:wrap;gap:3px\">"+aH.map(function(id){return avEl(id);}).join("")+(aH.length===0?"<span>--</span>":"")+"</div></td>"+
+        "<td><div style=\"display:flex;flex-wrap:wrap;gap:3px\">"+enR.map(function(x){return '<div style="position:relative">'+avEl(x.membreId)+'<span style="position:absolute;top:-3px;right:-3px;background:var(--accent);color:#000;font-size:8px;border-radius:8px;padding:0 2px;font-weight:700">'+fmt(x.montant)+"</span></div>";}).join("")+(enR.length===0?"<span>--</span>":"")+"</div></td>"+
+        "<td><div style=\"display:flex;flex-wrap:wrap;gap:3px\">"+(ru.absents||[]).map(function(id){return '<div style="opacity:.4">'+avEl(id)+"</div>";}).join("")+((ru.absents||[]).length===0?'<span class="badge bg">Tous</span>':"")+"</div></td>"+
+        '<td><button class="btn btn-s btn-sm" onclick="detReun(\''+ru.id+'\')">Detail</button></td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucune reunion</div></td></tr>');
+    var reunSai=reuns.filter(function(r){return r.date_reunion>=deb;});
+    var tot=reunSai.length,nbS=(CA&&CA.nb_absences_avant_amende)||3;
+    sH("reun-suivi-tbody",MC.filter(function(m){return m.statut==="actif";}).map(function(m){
+      var nbP=reunSai.filter(function(r){return (r.presents||[]).indexOf(m.id)>=0;}).length;
+      var nbRet=reunSai.filter(function(r){return (r.retards_list||[]).some(function(x){return x.membreId===m.id&&x.montant>0;});}).length;
+      var nbA=reunSai.filter(function(r){return (r.absents||[]).indexOf(m.id)>=0;}).length;
+      var pct=tot?Math.round(nbP/tot*100):100;
+      var col=pct>=80?"var(--green)":pct>=50?"var(--accent)":"var(--red)";
+      return "<tr><td>"+mChip(m.id)+"</td><td>"+tot+"</td>"+
+        '<td><div style="display:flex;align-items:center;gap:6px"><div class="progress" style="width:60px"><div class="progress-bar" style="width:'+pct+"%;background:"+col+'"></div></div><span style="font-size:11px">'+nbP+" ("+pct+"%)</span></div></td>"+
+        "<td>"+(nbRet?'<span class="badge by">'+nbRet+"</span>":"0")+"</td>"+
+        "<td>"+(nbA?'<span class="badge '+(nbA>=nbS?"badge-red":"badge-yellow")+'">'+nbA+(nbA>=nbS?" !":"")+"</span>":"0")+"</td>"+
+        "<td>"+(nbA>=nbS?'<span class="badge br">Amende active</span>':"<span style=\"color:var(--text3)\">--</span>")+"</td></tr>";
+    }).join('')||'<tr><td colspan="6"><div class="empty">Aucun membre actif</div></td></tr>');
+  });
+}
+function detReun(id){
+  sb.from("reunions").select("*").eq("id",id).single().then(function(r){
+    if(!r.data)return;
+    var ru=r.data;
+    E("reun-modal-titre").textContent=ru.titre;
+    var aH=(ru.presents||[]).filter(function(mid){return !(ru.retards_list||[]).find(function(x){return x.membreId===mid&&x.montant>0;});});
+    var enR=(ru.retards_list||[]).filter(function(x){return x.montant>0;});
+    var totR=enR.reduce(function(s,x){return s+x.montant;},0);
+    sH("reun-modal-content",
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px"><div><div class="stat-label">Date</div>'+fdD(ru.date_reunion)+"</div><div><div class=\"sl\">Lieu</div>"+(ru.lieu||"--")+'</div><div><div class="stat-label">Total retards</div><span style="color:var(--accent);font-weight:600">'+fmt(totR)+" EUR</span></div></div>"+
+      '<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">'+
+      "<div><div style=\"font-size:11px;color:var(--green);text-transform:uppercase;margin-bottom:8px\">A l'heure ("+aH.length+")</div>"+aH.map(function(mid){return '<div class="member-row" style="margin-bottom:6px">'+avEl(mid)+"<span>"+mNm(mid)+"</span></div>";}).join("")+(aH.length===0?"<span style=\"color:var(--text3)\">--</span>":"")+"</div>"+
+      "<div><div style=\"font-size:11px;color:var(--accent);text-transform:uppercase;margin-bottom:8px\">Retards ("+enR.length+")</div>"+enR.map(function(x){return '<div style="margin-bottom:8px;display:flex;align-items:center;gap:8px">'+avEl(x.membreId)+"<div><div style=\"font-size:13px\">"+mNm(x.membreId)+"</div><div style=\"font-size:11px;color:var(--text3)\">"+x.heure+" -> "+fmt(x.montant)+" EUR</div></div></div>";}).join("")+(enR.length===0?"<span style=\"color:var(--text3)\">--</span>":"")+"</div>"+
+      "<div><div style=\"font-size:11px;color:var(--red);text-transform:uppercase;margin-bottom:8px\">Absents ("+(ru.absents||[]).length+")</div>"+(ru.absents||[]).map(function(mid){return '<div class="member-row" style="margin-bottom:6px">'+avEl(mid)+"<span>"+mNm(mid)+"</span></div>";}).join("")+((ru.absents||[]).length===0?"<span style=\"color:var(--text3)\">--</span>":"")+"</div></div>"+
+      (ru.notes?"<hr style=\"border:none;border-top:1px solid var(--border);margin:12px 0\"><div style=\"font-size:11px;color:var(--text2);text-transform:uppercase;margin-bottom:6px\">Notes</div><p style=\"font-size:13px;color:var(--text2);white-space:pre-line\">"+ru.notes+"</p>":"")
+    );
+    E("reun-modal-del").onclick=function(){
+      if(!confirm("Supprimer cette reunion?"))return;
+      sb.from("retards").delete().eq("reunion_id",id).then(function(){
+        sb.from("amendes").delete().eq("reunion_id",id).then(function(){
+          sb.from("reunions").delete().eq("id",id).then(function(){closeMO("modal-reun");rReuns();});
+        });
+      });
+    };
+    openMO("modal-reun");
+  });
+}
+function initCompta(){
+  var yr=new Date().getFullYear(),sel=E("compta-annee");
+  if(sel&&!sel.options.length){for(var y=yr-3;y<=yr+1;y++){var o=document.createElement("option");o.value=y;o.text=y;if(y===yr)o.selected=true;sel.appendChild(o);}}
+  rCompta();
+}
+function rCompta(){
+  if(!CA)return;
+  var yr=+(E("compta-annee")?E("compta-annee").value:new Date().getFullYear())||new Date().getFullYear();
+  var aid=CA.id,st=yr+"-01-01",en=yr+"-12-31";
+  Promise.all([
+    sb.from("cotisations").select("*").eq("association_id",aid).eq("statut","paye").gte("date_paiement",st).lte("date_paiement",en),
+    sb.from("adhesions").select("*").eq("association_id",aid).eq("statut","paye").gte("date_paiement",st).lte("date_paiement",en),
+    sb.from("retards").select("*").eq("association_id",aid).eq("statut","paye").gte("date_paiement",st).lte("date_paiement",en),
+    sb.from("amendes").select("*").eq("association_id",aid).eq("statut","paye").gte("date_paiement",st).lte("date_paiement",en),
+    sb.from("dons").select("*").eq("association_id",aid).gte("date_don",st).lte("date_don",en),
+    sb.from("prets").select("*").eq("association_id",aid).gte("date_pret",st).lte("date_pret",en),
+    sb.from("remboursements").select("*").eq("association_id",aid).eq("statut","paye").eq("type","pret").gte("date_paiement",st).lte("date_paiement",en),
+    sb.from("sorties_caisse").select("*").eq("association_id",aid).gte("date_sortie",st).lte("date_sortie",en),
+    sb.from("virements_cotisation").select("*").eq("association_id",aid).gte("date_virement",st).lte("date_virement",en)
+  ]).then(function(rs){
+    var entries=[];
+    function push(list,type,dF,mF,descF,isC){(list||[]).forEach(function(x){entries.push({date:x[dF],type:type,mid:x[mF]||null,desc:descF(x),cr:isC?+x.montant:0,db:isC?0:+x.montant});});}
+    push(rs[0].data,"Cotisation","date_paiement","membre_id",function(x){return "Cotisation "+(x.mois||"");},true);
+    push(rs[1].data,"Adhesion","date_paiement","membre_id",function(x){return "Adhesion "+(x.annee||"");},true);
+    push(rs[2].data,"Retard","date_paiement","membre_id",function(x){return x.motif||"Retard";},true);
+    push(rs[3].data,"Amende","date_paiement","membre_id",function(x){return x.motif||"Amende";},true);
+    push(rs[4].data,"Don","date_don","beneficiaire_id",function(x){return "Don -- "+(x.motif||"");},false);
+    push(rs[5].data,"Pret","date_pret","beneficiaire_id",function(x){return "Pret -- "+(x.motif||"");},false);
+    push(rs[6].data,"Remb.pret","date_paiement","membre_id",function(){return "Remboursement pret";},true);
+    push(rs[7].data,"Sortie caisse","date_sortie",null,function(x){return x.description;},false);
+    push(rs[8].data,"Virement cot.","date_virement","membre_id",function(x){return x.motif||"Virement";},false);
+    entries.sort(function(a,b){return (a.date||"").localeCompare(b.date||"");});
+    var totC=entries.reduce(function(s,e){return s+e.cr;},0),totD=entries.reduce(function(s,e){return s+e.db;},0);
+    sH("compta-stats",'<div class="stat-card green"><div class="stat-label">Entrees '+yr+'</div><div class="stat-val">'+fmt(totC)+' EUR</div></div><div class="stat-card red"><div class="stat-label">Sorties '+yr+'</div><div class="stat-val">'+fmt(totD)+' EUR</div></div><div class="sc '+(totC-totD>=0?"y":"r")+'"><div class="stat-label">Solde net '+yr+'</div><div class="stat-val">'+fmt(totC-totD)+' EUR</div></div>');
+    var BADGE={Cotisation:"badge-yellow",Adhesion:"badge-blue",Retard:"badge-red",Amende:"badge-red",Don:"badge-purple",Pret:"badge-blue","Remb.pret":"badge-green","Sortie caisse":"badge-gray","Virement cot.":"badge-blue"};
+    var run=0;
+    sH("compta-tbody",entries.length?entries.map(function(en){run+=en.cr-en.db;
+      return "<tr><td>"+fdD(en.date)+"</td><td><span class=\"badge "+(BADGE[en.type]||"badge-gray")+'">'+en.type+"</span></td><td>"+(en.mid?mChip(en.mid):"--")+"</td><td>"+en.desc+"</td>"+
+        '<td style="color:var(--red)">'+(en.db?fmt(en.db)+" EUR":"--")+"</td><td style=\"color:var(--green)\">"+(en.cr?fmt(en.cr)+" EUR":"--")+"</td>"+
+        '<td style="font-weight:500;color:'+(run>=0?"var(--green)":"var(--red)")+'">'+fmt(run)+" EUR</td></tr>";
+    }).join(''):'<tr><td colspan="7"><div class="empty">Aucune operation en '+yr+"</div></td></tr>");
+  });
+}
+function exportCSV(){
+  var yr=+(E("compta-annee")?E("compta-annee").value:new Date().getFullYear())||new Date().getFullYear();
+  var rows=[["Date","Type","Membre","Description","Debit EUR","Credit EUR"]];
+  var trs=document.querySelectorAll("#comtb tr");
+  for(var i=0;i<trs.length;i++){var tds=trs[i].querySelectorAll("td");if(tds.length>=6)rows.push([tds[0].textContent.trim(),tds[1].textContent.trim(),tds[2].textContent.trim(),tds[3].textContent.trim(),tds[4].textContent.trim(),tds[5].textContent.trim()]);}
+  var csv=rows.map(function(r){return r.map(function(v){return '"'+v.replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
+  var a=document.createElement("a");a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);a.download="mboa-comptabilite-"+yr+".csv";a.click();
+}
+function rAlertes(){
+  if(!CA)return;
+  var aid=CA.id,t=td(),alertes=[];
+  Promise.all([sb.from("remboursements").select("*").eq("association_id",aid).eq("statut","en attente"),sb.from("cotisations").select("*").eq("association_id",aid).eq("statut","impaye"),sb.from("retards").select("*").eq("association_id",aid).eq("statut","impaye"),sb.from("amendes").select("*").eq("association_id",aid).eq("statut","impaye")]).then(function(rs){
+    (rs[0].data||[]).forEach(function(r){var j=Math.ceil((new Date(r.echeance)-new Date(t))/(1000*86400));if(j<=7)alertes.push({level:j<0?"danger":"warning",titre:"Remboursement "+r.type+(j<0?" EN RETARD":" bientot du"),texte:mNm(r.membre_id)+" -- "+fmt(r.montant)+" EUR",date:r.echeance,jours:j,page:r.type==="don"?"dons":"prets"});});
+    (rs[1].data||[]).forEach(function(c){var j=Math.ceil((new Date(t)-new Date(c.created_at||t))/(1000*86400));if(j>=7)alertes.push({level:j>=30?"danger":"warning",titre:"Cotisation impayee",texte:mNm(c.membre_id)+" -- "+(c.mois||"")+" -- "+fmt(c.montant)+" EUR",date:c.created_at,jours:-j,page:"cotisations"});});
+    (rs[2].data||[]).forEach(function(r){var j=Math.ceil((new Date(t)-new Date(r.date_infraction||t))/(1000*86400));if(j>=3)alertes.push({level:j>=30?"danger":"warning",titre:"Retard impaye",texte:mNm(r.membre_id)+" -- "+(r.motif||"")+" -- "+fmt(r.montant)+" EUR",date:r.date_infraction,jours:-j,page:"retards"});});
+    (rs[3].data||[]).forEach(function(a){var j=Math.ceil((new Date(t)-new Date(a.date_infraction||t))/(1000*86400));if(j>=3)alertes.push({level:j>=30?"danger":"warning",titre:"Amende impayee",texte:mNm(a.membre_id)+" -- "+(a.motif||"")+" -- "+fmt(a.montant)+" EUR",date:a.date_infraction,jours:-j,page:"amendes"});});
+    alertes.sort(function(a,b){return a.jours-b.jours;});
+    var urgents=alertes.filter(function(a){return a.level==="danger";}).length;
+    var badge=E("badge-alertes");if(badge){badge.style.display=urgents>0?"inline":"none";badge.textContent=""+urgents;}
+    if(!alertes.length){sH("alertes-container",'<div style="text-align:center;padding:60px 20px"><div style="font-size:48px;margin-bottom:12px">OK</div><div style="font-size:18px;font-weight:500">Tout est a jour!</div><div style="font-size:14px;color:var(--text3)">Aucune alerte en cours.</div></div>');return;}
+    var BGCOL={danger:"rgba(244,100,95,.1)",warning:"rgba(245,200,66,.1)"};
+    var BDCOL={danger:"rgba(244,100,95,.3)",warning:"rgba(245,200,66,.3)"};
+    var container=E("alertes-container");container.innerHTML="";
+    alertes.forEach(function(a){
+      var jTxt=a.jours<0?("Il y a "+(-a.jours)+" jour(s)"):a.jours===0?"Aujourd hui !":("Dans "+a.jours+" jour(s)");
+      var d=document.createElement("div");
+      d.style.cssText="background:"+BGCOL[a.level]+";border:1px solid "+BDCOL[a.level]+";border-radius:var(--rs);padding:14px 16px;margin-bottom:10px;cursor:pointer";
+      d.innerHTML='<div style="display:flex;align-items:center;gap:10px">'+
+        '<div style="flex:1"><div style="font-weight:500;font-size:14px">'+a.titre+'</div><div style="font-size:13px;color:var(--text2);margin-top:2px">'+a.texte+"</div></div>"+
+        '<div style="text-align:right;flex-shrink:0"><div style="font-size:11px;color:var(--text3)">'+fdD(a.date)+'</div><div style="font-size:12px;font-weight:500;margin-top:2px">'+jTxt+"</div></div></div>";
+      d.addEventListener("click",(function(pg){return function(){G(pg);};})(a.page));
+      container.appendChild(d);
+    });
+  });
+}
+function rMC(){
+  var id=(E("mc-select")||{}).value;
+  if(!id){sH("mc-content",'<div class="empty">Selectionnez un membre</div>');return;}
+  var m=MC.find(function(x){return x.id===id;});if(!m)return;
+  var aid=CA.id,t=td();
+  Promise.all([sb.from("cotisations").select("*").eq("association_id",aid).eq("membre_id",id).order("mois",{ascending:false}),sb.from("retards").select("*").eq("association_id",aid).eq("membre_id",id),sb.from("amendes").select("*").eq("association_id",aid).eq("membre_id",id),sb.from("remboursements").select("*").eq("association_id",aid).eq("membre_id",id).eq("statut","en attente"),sb.from("reunions").select("id,titre,date_reunion,presents,absents,retards_list").eq("association_id",aid).order("date_reunion",{ascending:false}),sb.from("dons").select("*").eq("association_id",aid).eq("beneficiaire_id",id),sb.from("prets").select("*").eq("association_id",aid).eq("beneficiaire_id",id)]).then(function(rs){
+    var cots=rs[0].data||[],rets=rs[1].data||[],ams=rs[2].data||[],rembs=rs[3].data||[],reuns=rs[4].data||[],donsB=rs[5].data||[],pretsB=rs[6].data||[];
+    var totC=cots.filter(function(c){return c.statut==="paye";}).reduce(function(s,c){return s+(+c.montant);},0);
+    var retImp=rets.filter(function(r){return r.statut==="impaye";}).reduce(function(s,r){return s+(+r.montant);},0);
+    var amImp=ams.filter(function(a){return a.statut==="impaye";}).reduce(function(s,a){return s+(+a.montant);},0);
+    var rembTot=rembs.reduce(function(s,r){return s+(+r.montant);},0);
+    var deb=debut(),reunSai=reuns.filter(function(r){return r.date_reunion>=deb;});
+    var nbP=reunSai.filter(function(r){return (r.presents||[]).indexOf(id)>=0;}).length;
+    var pct=reunSai.length?Math.round(nbP/reunSai.length*100):100;
+    var pctC=pct>=80?"var(--green)":pct>=50?"var(--accent)":"var(--red)";
+    var h='<div class="card" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:0">'+
+      '<div class="avatar '+mCol(id)+'" style="width:60px;height:60px;font-size:22px">'+mIn(id)+"</div>"+
+      '<div style="flex:1"><div style="font-family:\'DM Serif Display\',serif;font-size:24px">'+m.prenom+" "+m.nom+"</div>"+
+      '<div style="color:var(--text2);font-size:13px;margin-top:4px">'+(m.email||"")+(m.email&&m.tel?" | ":""+(m.tel||""))+"</div>"+
+      '<div style="margin-top:8px"><span class="badge '+(m.statut==="actif"?"badge-green":"badge-gray")+'">'+(m.statut==="actif"?"Actif":"Inactif")+'</span> <span style="font-size:12px;color:var(--text3)">Depuis '+fdD(m.date_adhesion)+"</span></div></div>"+
+      '<button onclick="editM(\''+id+'\')" class="btn btn-s btn-sm">Modifier</button></div>'+
+      '<div class="sg" style="margin-top:18px">'+
+      '<div class="stat-card blue"><div class="stat-label">Fonds adhesion</div><div class="stat-val">'+fmt(FC[id]||0)+' EUR</div></div>'+
+      '<div class="stat-card green"><div class="stat-label">Cotisations payees</div><div class="stat-val">'+fmt(totC)+' EUR</div></div>'+
+      '<div class="stat-card red"><div class="stat-label">Retards dus</div><div class="stat-val">'+fmt(retImp)+' EUR</div></div>'+
+      '<div class="stat-card red"><div class="stat-label">Amendes dues</div><div class="stat-val">'+fmt(amImp)+' EUR</div></div>'+
+      '<div class="stat-card yellow"><div class="stat-label">Remb. en cours</div><div class="stat-val">'+fmt(rembTot)+' EUR</div></div>'+
+      '<div class="stat-card" style="border-color:'+pctC+'"><div class="stat-label">Presence reunions</div><div class="stat-val" style="color:'+pctC+'">'+pct+'%</div><div class="stat-sub">'+nbP+"/"+reunSai.length+" saison</div></div>"+
+      "</div>"+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px">'+
+      '<div class="card"><div class="card-title">Cotisations recentes</div>'+
+      (cots.length?cots.slice(0,6).map(function(c){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span>'+(c.mois||"--")+'</span><div style="display:flex;align-items:center;gap:8px"><span style="font-weight:500">'+fmt(c.montant)+' EUR</span><span class="badge '+(c.statut==="paye"?"badge-green":"badge-red")+'">'+(c.statut==="paye"?"Paye":"Impaye")+"</span></div></div>";}).join(''):'<p style="color:var(--text3);font-size:13px">Aucune cotisation</p>')+"</div>"+
+      '<div class="card"><div class="card-title">Reunions (saison)</div>'+
+      '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px"><span>Taux de presence</span><span>'+pct+'%</span></div><div class="progress" style="height:10px"><div class="progress-bar" style="width:'+pct+"%;background:"+pctC+'"></div></div></div>'+
+      (reunSai.slice(0,5).map(function(r){var pr=(r.presents||[]).indexOf(id)>=0;return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px"><span>'+r.titre+'</span><div style="display:flex;align-items:center;gap:6px"><span style="font-size:11px;color:var(--text3)">'+fdD(r.date_reunion)+'</span><span class="badge '+(pr?"badge-green":"badge-red")+'">'+(pr?"Present":"Absent")+"</span></div></div>";}).join('')||'<p style="color:var(--text3);font-size:13px">Aucune reunion</p>')+"</div>"+
+      '<div class="card"><div class="card-title">Retards et Amendes</div>'+
+      ([].concat(rets.map(function(r){return Object.assign({},r,{_t:"Retard"});}),ams.map(function(a){return Object.assign({},a,{_t:"Amende"});})).slice(0,6).map(function(x){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><div><span class="badge br" style="margin-right:6px">'+x._t+'</span><span>'+(x.motif||"--")+'</span></div><div style="display:flex;align-items:center;gap:8px"><span style="font-weight:500">'+fmt(x.montant)+' EUR</span><span class="badge '+(x.statut==="paye"?"badge-green":"badge-red")+'">'+(x.statut==="paye"?"Paye":"Impaye")+"</span></div></div>";}).join('')||'<p style="color:var(--text3);font-size:13px">Aucun retard ni amende</p>')+"</div>"+
+      '<div class="card"><div class="card-title">Remboursements en cours</div>'+
+      (rembs.length?rembs.map(function(r){var ov=r.echeance<t;return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><div><span class="badge '+(r.type==="don"?"badge-purple":"badge-blue")+'" style="margin-right:6px">'+r.type+'</span><span style="font-size:11px;color:var(--text3)">ech.'+fdD(r.echeance)+'</span></div><div style="display:flex;align-items:center;gap:8px"><span style="font-weight:500">'+fmt(r.montant)+' EUR</span><span class="badge '+(ov?"badge-red":"badge-yellow")+'">'+(ov?"En retard":"En attente")+"</span></div></div>";}).join(''):'<p style="color:var(--text3);font-size:13px">Aucun remboursement</p>')+
+      (donsB.length||pretsB.length?'<hr style="border:none;border-top:1px solid var(--border);margin:10px 0">'+donsB.map(function(d){return '<div style="font-size:13px;padding:4px 0"><span class="badge bp">Don recu</span> '+fmt(d.montant)+" EUR le "+fdD(d.date_don)+"</div>";}).join("")+pretsB.map(function(p){return '<div style="font-size:13px;padding:4px 0"><span class="badge bb">Pret recu</span> '+fmt(p.montant)+" EUR le "+fdD(p.date_pret)+"</div>";}).join(""):"")+"</div>"+
+      "</div>";
+    sH("mc-content",h);
+  });
+}
+function loadConf(){
+  applyConf();
+  var plan=(CA&&CA.plan)||"gratuit";
+  sH("cf-plan",plan==="gratuit"?'<div class="alert alert-warning">Plan gratuit -- Limite 10 membres.</div><button onclick="alert(\'Contactez-nous pour Stripe.\')" class="btn btn-primary" style="width:auto;margin-top:10px">Passer au Starter -- 15 EUR/mois</button>':'<div class="alert alert-success">Plan '+plan+" actif</div>");
+}
+function saveConf(){
+  if(!CA)return;
+  var col=gV("cf-col-hex");
+  var up={nom:gV("cf-nom"),couleur_accent:col,heure_reunion:E("cf-heure").value,tranche1_max:E("cf-t1").value,tranche1_montant:+E("cf-m1").value,tranche2_max:E("cf-t2").value,tranche2_montant:+E("cf-m2").value,montant_amende_absence:+E("cf-am").value,nb_absences_avant_amende:+E("cf-nba").value,mois_reset:+E("cf-mr").value,duree_remboursement_mois:+E("cf-dr").value};
+  sb.from("associations").update(up).eq("id",CA.id).then(function(r){
+    var msg=E("cf-msg");
+    if(r.error){msg.className="alert alert-error";msg.textContent="Erreur: "+r.error.message;}
+    else{Object.assign(CA,up);E("sb-nom").textContent=up.nom||"Mboa";if(col)document.documentElement.style.setProperty("--accent",col);msg.className="alert alert-success";msg.textContent="Configuration sauvegardee!";}
+    msg.classList.remove("hidden");setTimeout(function(){msg.classList.add("hidden");},3000);
+  });
+}
+
+// ================================================================
+// SUPERADMIN
+// ================================================================
+var SA_ALL_ASSOC = [];
+var CURRENT_REUN_ID = null;
+
+function checkSuperAdmin() {
+  if (!CU) return;
+  IS_SUPERADMIN = (CU.email === SUPERADMIN_EMAIL);
+  var navSA = document.getElementById('nav-superadmin');
+  if (navSA) navSA.style.display = IS_SUPERADMIN ? 'flex' : 'none';
+}
+
+async function rSuperAdmin() {
+  if (!IS_SUPERADMIN) { alert('Acces refuse.'); return; }
+  // Load all associations
+  var ra = await sb.from('associations').select('*').order('created_at', {ascending:false});
+  SA_ALL_ASSOC = ra.data || [];
+
+  // Load all members count per association
+  var rm = await sb.from('membres').select('association_id');
+  var mCount = {};
+  (rm.data || []).forEach(function(m) {
+    mCount[m.association_id] = (mCount[m.association_id] || 0) + 1;
+  });
+
+  // Stats
+  var total = SA_ALL_ASSOC.length;
+  var starters = SA_ALL_ASSOC.filter(function(a) { return a.plan === 'starter'; }).length;
+  var pros = SA_ALL_ASSOC.filter(function(a) { return a.plan === 'pro'; }).length;
+  var rev = starters * 15 + pros * 29;
+
+  sH('sa-stats',
+    '<div class="stat-card yellow"><div class="stat-label">Associations totales</div><div class="stat-val">' + total + '</div></div>' +
+    '<div class="stat-card green"><div class="stat-label">Plan Starter</div><div class="stat-val">' + starters + '</div><div class="stat-sub">15 EUR/mois chacun</div></div>' +
+    '<div class="stat-card blue"><div class="stat-label">Plan Pro</div><div class="stat-val">' + pros + '</div><div class="stat-sub">29 EUR/mois chacun</div></div>' +
+    '<div class="stat-card green"><div class="stat-label">Revenu mensuel estim\u00e9</div><div class="stat-val">' + fmt(rev) + ' EUR</div></div>'
+  );
+
+  // Association list
+  sH('sa-total-badge', '' + total);
+  var PLAN_BADGE = {gratuit:'badge-gray', starter:'badge-yellow', pro:'badge-blue'};
+  var assocHtml = SA_ALL_ASSOC.map(function(a) {
+    var nb = mCount[a.id] || 0;
+    var plan = a.plan || 'gratuit';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);flex-wrap:wrap">' +
+      '<div style="flex:1"><div style="font-weight:500;font-size:13px">' + (a.nom || 'Sans nom') + '</div>' +
+      '<div style="font-size:11px;color:var(--text3)">' + nb + ' membre(s) \u00b7 ' + (a.slug || '') + '</div></div>' +
+      '<span class="badge ' + (PLAN_BADGE[plan] || 'badge-gray') + '">' + plan + '</span>' +
+      '<button onclick="quickEditAssoc(\'' + a.id + '\')" class="btn btn-secondary btn-sm">Modifier</button>' +
+      '</div>';
+  }).join('');
+  sH('sa-assoc-list', assocHtml || '<div class="empty">Aucune association</div>');
+
+  // Populate select
+  var opts = '<option value="">-- Choisir --</option>' +
+    SA_ALL_ASSOC.map(function(a) {
+      return '<option value="' + a.id + '">' + (a.nom || 'Sans nom') + ' [' + (a.plan || 'gratuit') + ']</option>';
+    }).join('');
+  var sel = E('sa-sel-assoc'); if (sel) sel.innerHTML = opts;
+
+  // Alerts - associations approaching limit
+  var alerts = [];
+  SA_ALL_ASSOC.forEach(function(a) {
+    var nb = mCount[a.id] || 0;
+    var plan = a.plan || 'gratuit';
+    if (plan === 'gratuit' && nb >= 8) {
+      alerts.push('<div style="background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.3);border-radius:var(--radius-sm);padding:10px;margin-bottom:8px;font-size:13px">' +
+        '<strong>' + (a.nom || 'Association') + '</strong> approche la limite (' + nb + '/10 membres)<br>' +
+        '<span style="font-size:11px;color:var(--text3)">Plan gratuit \u2014 opportunit\u00e9 de vente</span></div>');
+    }
+  });
+  sH('sa-alerts', alerts.length ?
+    alerts.join('') :
+    '<div class="empty">Aucune alerte</div>'
+  );
+}
+
+function quickEditAssoc(id) {
+  var sel = E('sa-sel-assoc'); if (sel) sel.value = id;
+  loadSAAssoc();
+  E('sa-sel-assoc').scrollIntoView({behavior:'smooth'});
+}
+
+function loadSAAssoc() {
+  var id = (E('sa-sel-assoc') || {}).value;
+  if (!id) return;
+  var a = SA_ALL_ASSOC.find(function(x) { return x.id === id; });
+  if (!a) return;
+  var plan = E('sa-plan'); if (plan) plan.value = a.plan || 'gratuit';
+  var limit = E('sa-limit'); if (limit) limit.value = a.membre_limit || 0;
+}
+
+async function saveSAAssoc() {
+  if (!IS_SUPERADMIN) return;
+  var id = (E('sa-sel-assoc') || {}).value;
+  if (!id) { alert('Choisissez une association.'); return; }
+  var plan = (E('sa-plan') || {}).value || 'gratuit';
+  var limit = +(E('sa-limit') || {}).value || 0;
+  var r = await sb.from('associations').update({plan: plan, membre_limit: limit}).eq('id', id);
+  var msg = E('sa-msg');
+  if (r.error) {
+    msg.className = 'alert alert-error'; msg.textContent = 'Erreur: ' + r.error.message;
+  } else {
+    msg.className = 'alert alert-success'; msg.textContent = 'Association mise a jour avec succes!';
+    // Update local cache
+    var idx = SA_ALL_ASSOC.findIndex(function(x) { return x.id === id; });
+    if (idx >= 0) { SA_ALL_ASSOC[idx].plan = plan; SA_ALL_ASSOC[idx].membre_limit = limit; }
+    rSuperAdmin();
+  }
+  msg.classList.remove('hidden');
+  setTimeout(function() { msg.classList.add('hidden'); }, 3000);
+}
+
+// ================================================================
+// TRANCHES HORAIRES RETARD
+// ================================================================
+function getTranches() {
+  var tranches = [
+    {label: (CA&&CA.heure_reunion||'17:30') + ' - ' + (CA&&CA.tranche1_max||'18:00'), montant: (CA&&CA.tranche1_montant)||2.5},
+    {label: (CA&&CA.tranche1_max||'18:00') + ' - ' + (CA&&CA.tranche2_max||'19:00'), montant: (CA&&CA.tranche2_montant)||5},
+    {label: 'Apres ' + (CA&&CA.tranche2_max||'19:00'), montant: (CA&&CA.tranche2_montant)||5}
+  ];
+  return tranches;
+}
+
+function buildTrancheSelect(mid, selectedMontant) {
+  var tranches = getTranches();
+  var opts = '<option value="0">Selectionner une tranche...</option>' +
+    tranches.map(function(t) {
+      var sel = selectedMontant && +selectedMontant === +t.montant ? ' selected' : '';
+      return '<option value="' + t.montant + '"' + sel + '>' + t.label + ' → ' + fmt(t.montant) + ' EUR</option>';
+    }).join('');
+  return '<select onchange="upRPTranche(\'' + mid + '\',this.value)" style="font-size:12px;padding:4px 8px;width:100%;margin-top:4px">' + opts + '</select>';
+}
+
+function upRPTranche(mid, montant) {
+  // Update montant display
+  var mEl = document.getElementById('rhm-' + mid);
+  if (mEl) mEl.textContent = +montant > 0 ? ('→ ' + fmt(+montant) + ' EUR') : '';
+  // Store montant on the radio button
+  var radio = document.querySelector('input[name="rp-' + mid + '"]:checked');
+  if (radio) radio.dataset.montant = montant;
+}
+
+// Override pReun to use dropdown tranches
+function pReun() {
+  var heure = (CA&&CA.heure_reunion)||'17:30';
+  var infoEl = E('reun-saison-info');
+  if (infoEl) infoEl.textContent = 'Saison ' + saison() + ' — Depuis le ' + fdD(debut()) + ' — Heure fixee: ' + heure + ' | T1: ' + fmt((CA&&CA.tranche1_montant)||2.5) + ' EUR | T2: ' + fmt((CA&&CA.tranche2_montant)||5) + ' EUR | Amende: ' + fmt((CA&&CA.montant_amende_absence)||15) + ' EUR apres ' + ((CA&&CA.nb_absences_avant_amende)||3) + ' absences';
+
+  var dt = E('reun-dt'); if (dt) dt.value = td();
+  var grid = E('reun-presences'); if (!grid) return;
+  var actifs = MC.filter(function(m) { return m.statut === 'actif'; });
+  grid.innerHTML = actifs.map(function(m) {
+    return '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-bottom:6px">' +
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+      avEl(m.id) +
+      '<span style="font-size:13px;font-weight:500;flex:1;min-width:100px">' + m.prenom + ' ' + m.nom + '</span>' +
+      '<div style="display:flex;gap:5px;flex-wrap:wrap">' +
+      '<label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--green);background:rgba(62,207,142,.1);color:var(--green)">' +
+      '<input type="radio" name="rp-' + m.id + '" value="heure" checked onchange="upRP(\'' + m.id + '\')" style="accent-color:var(--green)"> Heure</label>' +
+      '<label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--accent);background:rgba(245,200,66,.1);color:var(--accent)">' +
+      '<input type="radio" name="rp-' + m.id + '" value="retard" onchange="upRP(\'' + m.id + '\')" style="accent-color:var(--accent)"> Retard</label>' +
+      '<label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--red);background:rgba(244,100,95,.1);color:var(--red)">' +
+      '<input type="radio" name="rp-' + m.id + '" value="absent" onchange="upRP(\'' + m.id + '\')" style="accent-color:var(--red)"> Absent</label>' +
+      '</div></div>' +
+      '<div id="rh-' + m.id + '" style="display:none;margin-top:8px">' +
+      buildTrancheSelect(m.id, 0) +
+      '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function upRP(mid) {
+  var radioEl = document.querySelector('input[name="rp-' + mid + '"]:checked');
+  var val = radioEl ? radioEl.value : 'heure';
+  var div = E('rh-' + mid);
+  if (val === 'retard') {
+    if (div) div.style.display = 'block';
+  } else {
+    if (div) div.style.display = 'none';
+  }
+}
+
+// Override saveReun to use tranche dropdown values
+var _origSaveReun = saveReun;
+saveReun = function() {
+  var titre = gV('reun-titre'), date = E('reun-dt').value;
+  if (!titre || !date) { alert('Titre et date requis.'); return; }
+  var actifs = MC.filter(function(m) { return m.statut === 'actif'; });
+  var presents = [], retards_list = [], absents = [];
+  actifs.forEach(function(m) {
+    var radioEl = document.querySelector('input[name="rp-' + m.id + '"]:checked');
+    var val = radioEl ? radioEl.value : 'heure';
+    if (val === 'absent') {
+      absents.push(m.id);
+    } else if (val === 'retard') {
+      var sel = document.querySelector('#rh-' + m.id + ' select');
+      var montant = sel ? +sel.value : 0;
+      var heure = new Date().toTimeString().slice(0,5);
+      retards_list.push({membreId: m.id, heure: heure, montant: montant});
+      presents.push(m.id);
+    } else {
+      presents.push(m.id);
+    }
+  });
+  var lieu = gV('reun-lieu'), notes = gV('reun-notes');
+  sb.from('reunions').insert({association_id:CA.id,titre:titre,date_reunion:date,lieu:lieu||null,notes:notes||null,presents:presents,absents:absents,retards_list:retards_list}).select().single().then(function(r) {
+    if (r.error) { alert('Erreur: ' + r.error.message); return; }
+    var reun = r.data;
+    var retsData = retards_list.filter(function(r2) { return r2.montant > 0; }).map(function(r2) {
+      return {association_id:CA.id,membre_id:r2.membreId,motif:'Retard reunion: ' + titre,montant:r2.montant,date_infraction:date,statut:'impaye',source:'reunion',reunion_id:reun.id};
+    });
+    var p = retsData.length ? sb.from('retards').insert(retsData) : Promise.resolve();
+    p.then(function() {
+      sb.from('reunions').select('id,absents,date_reunion').eq('association_id',CA.id).then(function(ra) {
+        var allR = ra.data || [];
+        var nbS = (CA&&CA.nb_absences_avant_amende)||3, montAm = (CA&&CA.montant_amende_absence)||15;
+        var amData = [];
+        absents.forEach(function(mid) {
+          var nbAv = nbAbsSaison(mid, allR, reun.id);
+          if (nbAv + 1 >= nbS) amData.push({association_id:CA.id,membre_id:mid,motif:'Amende absence (' + (nbAv+1) + 'e saison ' + saison() + ') -- ' + titre,montant:montAm,date_infraction:date,statut:'impaye',source:'reunion',reunion_id:reun.id});
+        });
+        var p2 = amData.length ? sb.from('amendes').insert(amData) : Promise.resolve();
+        p2.then(function() {
+          E('reun-titre').value = ''; E('reun-notes').value = '';
+          rReuns(); E('page-reunions').querySelectorAll('.tab')[0].click();
+        });
+      });
+    });
+  });
+};
+
+// ================================================================
+// REUNION MODIFIABLE (jour meme seulement)
+// ================================================================
+var REUN_EDIT_DATA = null;
+
+function toggleReunEdit() {
+  var editDiv = E('reun-modal-edit');
+  var editBtn = E('reun-modal-edit-btn');
+  var saveBtn = E('reun-modal-save');
+  if (!editDiv) return;
+  var isOpen = !editDiv.classList.contains('hidden');
+  if (isOpen) {
+    editDiv.classList.add('hidden');
+    editBtn.textContent = 'Modifier';
+    saveBtn.style.display = 'none';
+  } else {
+    editDiv.classList.remove('hidden');
+    editBtn.textContent = 'Annuler';
+    saveBtn.style.display = 'inline-flex';
+    buildReunEditForm();
+  }
+}
+
+function buildReunEditForm() {
+  if (!REUN_EDIT_DATA) return;
+  var ru = REUN_EDIT_DATA;
+  // Notes
+  var notesEl = E('reun-edit-notes'); if (notesEl) notesEl.value = ru.notes || '';
+  // Presences grid
+  var grid = E('reun-edit-presences'); if (!grid) return;
+  var actifs = MC.filter(function(m) { return m.statut === 'actif'; });
+  grid.innerHTML = actifs.map(function(m) {
+    var isPresent = (ru.presents || []).indexOf(m.id) >= 0;
+    var isAbsent  = (ru.absents  || []).indexOf(m.id) >= 0;
+    var retInfo   = (ru.retards_list || []).find(function(x) { return x.membreId === m.id; });
+    var isRetard  = !!retInfo;
+    var currentVal = isAbsent ? 'absent' : isRetard ? 'retard' : 'heure';
+    return '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;margin-bottom:5px">' +
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+      avEl(m.id) + '<span style="font-size:13px;font-weight:500;flex:1">' + m.prenom + ' ' + m.nom + '</span>' +
+      '<div style="display:flex;gap:5px">' +
+      '<label style="font-size:12px;cursor:pointer;padding:4px 8px;border-radius:5px;border:1px solid var(--green);' + (currentVal==='heure'?'background:rgba(62,207,142,.2)':'') + '"><input type="radio" name="ed-rp-' + m.id + '" value="heure" ' + (currentVal==='heure'?'checked':'') + ' onchange="upERP(\'' + m.id + '\')"> Heure</label>' +
+      '<label style="font-size:12px;cursor:pointer;padding:4px 8px;border-radius:5px;border:1px solid var(--accent);' + (currentVal==='retard'?'background:rgba(245,200,66,.2)':'') + '"><input type="radio" name="ed-rp-' + m.id + '" value="retard" ' + (currentVal==='retard'?'checked':'') + ' onchange="upERP(\'' + m.id + '\')"> Retard</label>' +
+      '<label style="font-size:12px;cursor:pointer;padding:4px 8px;border-radius:5px;border:1px solid var(--red);' + (currentVal==='absent'?'background:rgba(244,100,95,.2)':'') + '"><input type="radio" name="ed-rp-' + m.id + '" value="absent" ' + (currentVal==='absent'?'checked':'') + ' onchange="upERP(\'' + m.id + '\')"> Absent</label>' +
+      '</div></div>' +
+      '<div id="ed-rh-' + m.id + '" style="display:' + (currentVal==='retard'?'block':'none') + ';margin-top:6px">' +
+      buildTrancheSelect('ed-' + m.id, retInfo ? retInfo.montant : 0) +
+      '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function upERP(mid) {
+  var radioEl = document.querySelector('input[name="ed-rp-' + mid + '"]:checked');
+  var val = radioEl ? radioEl.value : 'heure';
+  var div = E('ed-rh-' + mid);
+  if (div) div.style.display = val === 'retard' ? 'block' : 'none';
+}
+
+async function saveReunEdit() {
+  if (!REUN_EDIT_DATA) return;
+  var id = REUN_EDIT_DATA.id;
+  var date = REUN_EDIT_DATA.date_reunion;
+  var notes = (E('reun-edit-notes') || {}).value || '';
+  var actifs = MC.filter(function(m) { return m.statut === 'actif'; });
+  var presents = [], retards_list = [], absents = [];
+  actifs.forEach(function(m) {
+    var radioEl = document.querySelector('input[name="ed-rp-' + m.id + '"]:checked');
+    var val = radioEl ? radioEl.value : 'heure';
+    if (val === 'absent') {
+      absents.push(m.id);
+    } else if (val === 'retard') {
+      var sel = document.querySelector('#ed-rh-' + m.id + ' select');
+      var montant = sel ? +sel.value : 0;
+      retards_list.push({membreId: m.id, heure: new Date().toTimeString().slice(0,5), montant: montant});
+      presents.push(m.id);
+    } else {
+      presents.push(m.id);
+    }
+  });
+  // Update reunion
+  await sb.from('reunions').update({presents:presents, absents:absents, retards_list:retards_list, notes:notes}).eq('id', id);
+  // Delete old auto-generated retards/amendes for this reunion then recreate
+  await sb.from('retards').delete().eq('reunion_id', id).eq('source', 'reunion');
+  await sb.from('amendes').delete().eq('reunion_id', id).eq('source', 'reunion');
+  var retsData = retards_list.filter(function(r) { return r.montant > 0; }).map(function(r) {
+    return {association_id:CA.id,membre_id:r.membreId,motif:'Retard reunion: ' + REUN_EDIT_DATA.titre,montant:r.montant,date_infraction:date,statut:'impaye',source:'reunion',reunion_id:id};
+  });
+  if (retsData.length) await sb.from('retards').insert(retsData);
+  var allR = (await sb.from('reunions').select('id,absents,date_reunion').eq('association_id',CA.id)).data || [];
+  var nbS = (CA&&CA.nb_absences_avant_amende)||3, montAm = (CA&&CA.montant_amende_absence)||15;
+  var amData = [];
+  absents.forEach(function(mid) {
+    var nbAv = nbAbsSaison(mid, allR, id);
+    if (nbAv + 1 >= nbS) amData.push({association_id:CA.id,membre_id:mid,motif:'Amende absence -- ' + REUN_EDIT_DATA.titre,montant:montAm,date_infraction:date,statut:'impaye',source:'reunion',reunion_id:id});
+  });
+  if (amData.length) await sb.from('amendes').insert(amData);
+  closeModal('modal-reun');
+  rReuns();
+  alert('Reunion mise a jour!');
+}
+
+// Override detReun to add edit button logic (only today)
+var _origDetReun = detReun;
+detReun = function(id) {
+  sb.from('reunions').select('*').eq('id', id).single().then(function(r) {
+    if (!r.data) return;
+    var ru = r.data;
+    REUN_EDIT_DATA = ru;
+    CURRENT_REUN_ID = id;
+    E('reun-modal-titre').textContent = ru.titre;
+    var aH = (ru.presents||[]).filter(function(mid) { return !(ru.retards_list||[]).find(function(x) { return x.membreId === mid && x.montant > 0; }); });
+    var enR = (ru.retards_list||[]).filter(function(x) { return x.montant > 0; });
+    var totR = enR.reduce(function(s,x) { return s+x.montant; }, 0);
+    sH('reun-modal-content',
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">' +
+      '<div><div class="stat-label">Date</div>' + fdD(ru.date_reunion) + '</div>' +
+      '<div><div class="stat-label">Lieu</div>' + (ru.lieu||'--') + '</div>' +
+      '<div><div class="stat-label">Total retards</div><span style="color:var(--accent);font-weight:600">' + fmt(totR) + ' EUR</span></div></div>' +
+      '<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">' +
+      '<div><div style="font-size:11px;color:var(--green);text-transform:uppercase;margin-bottom:8px">A l\'heure (' + aH.length + ')</div>' +
+      aH.map(function(mid) { return '<div class="member-row" style="margin-bottom:6px">' + avEl(mid) + '<span>' + mNm(mid) + '</span></div>'; }).join('') +
+      (aH.length===0?'<span style="color:var(--text3)">--</span>':'') + '</div>' +
+      '<div><div style="font-size:11px;color:var(--accent);text-transform:uppercase;margin-bottom:8px">Retards (' + enR.length + ')</div>' +
+      enR.map(function(x) { return '<div style="margin-bottom:8px"><div class="member-row">' + avEl(x.membreId) + '<div><div style="font-size:13px">' + mNm(x.membreId) + '</div><div style="font-size:11px;color:var(--text3)">' + x.heure + ' → ' + fmt(x.montant) + ' EUR</div></div></div></div>'; }).join('') +
+      (enR.length===0?'<span style="color:var(--text3)">--</span>':'') + '</div>' +
+      '<div><div style="font-size:11px;color:var(--red);text-transform:uppercase;margin-bottom:8px">Absents (' + (ru.absents||[]).length + ')</div>' +
+      (ru.absents||[]).map(function(mid) { return '<div class="member-row" style="margin-bottom:6px">' + avEl(mid) + '<span>' + mNm(mid) + '</span></div>'; }).join('') +
+      ((ru.absents||[]).length===0?'<span style="color:var(--text3)">--</span>':'') + '</div></div>' +
+      (ru.notes ? '<hr style="border:none;border-top:1px solid var(--border);margin:12px 0"><div style="font-size:11px;color:var(--text2);text-transform:uppercase;margin-bottom:6px">Notes</div><p style="font-size:13px;color:var(--text2);white-space:pre-line">' + ru.notes + '</p>' : '')
+    );
+    // Show edit button only if reunion is today
+    var editBtn = E('reun-modal-edit-btn');
+    var saveBtn = E('reun-modal-save');
+    var editDiv = E('reun-modal-edit');
+    if (editBtn) {
+      var isToday = ru.date_reunion === td();
+      editBtn.style.display = isToday ? 'inline-flex' : 'none';
+      if (saveBtn) saveBtn.style.display = 'none';
+      if (editDiv) editDiv.classList.add('hidden');
+      editBtn.textContent = 'Modifier';
+    }
+    E('reun-modal-del').onclick = function() {
+      if (!confirm('Supprimer cette reunion?')) return;
+      sb.from('retards').delete().eq('reunion_id', id).then(function() {
+        sb.from('amendes').delete().eq('reunion_id', id).then(function() {
+          sb.from('reunions').delete().eq('id', id).then(function() { closeModal('modal-reun'); rReuns(); });
+        });
+      });
+    };
+    openModal('modal-reun');
+  });
+};
+
+
+function exportData(){
+  if(!CA)return;
+  var aid=CA.id;
+  var tables=["membres","cotisations","adhesions","retards","amendes","reunions","dons","prets","remboursements","sorties_caisse","virements_cotisation","fonds_adhesion"];
+  var result={association:CA,_date:new Date().toISOString()};
+  var ps=tables.map(function(tb){return sb.from(tb).select("*").eq("association_id",aid).then(function(r){result[tb]=r.data||[];});});
+  Promise.all(ps).then(function(){var a=document.createElement("a");a.href="data:application/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(result,null,2));a.download="mboa-export-"+td()+".json";a.click();});
+}
+
+
+</script>
+</body>
+</html>
