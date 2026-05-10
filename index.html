@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mboa — Gestion d'Association</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181b24;--bg3:#1e2230;--card:#232736;--border:#2e3348;
+  --accent:#f5c842;--accent2:#e8a020;--green:#3ecf8e;--red:#f4645f;--blue:#5b8def;--purple:#9b72e8;
+  --text:#f0f2f8;--text2:#8b91a8;--text3:#5a607a;--radius:12px;--radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.hidden{display:none!important}
+a{color:inherit;text-decoration:none}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;transition:all .15s}
+.btn-primary{background:var(--accent);color:#1a1400;width:100%;padding:12px}
+.btn-primary:hover{background:var(--accent2)}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:rgba(244,100,95,.15);color:var(--red);border:1px solid rgba(244,100,95,.3)}
+.btn-sm{padding:5px 10px;font-size:12px;width:auto!important}
+.btn-s{background:rgba(62,207,142,.1);color:var(--green);border:1px solid rgba(62,207,142,.3);padding:5px 10px;font-size:12px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
+.btn-d{background:rgba(244,100,95,.1);color:var(--red);border:1px solid rgba(244,100,95,.3);padding:5px 10px;font-size:12px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
+
+/* FORMS */
+input,select,textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:80px}
+select option{background:var(--bg2)}
+label{display:block;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:500}
+.form-group{margin-bottom:14px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+
+/* ALERTS */
+.alert{border-radius:var(--radius-sm);padding:11px 14px;font-size:13px;margin-bottom:14px;border:1px solid;line-height:1.5}
+.alert-error{background:rgba(244,100,95,.1);border-color:rgba(244,100,95,.3);color:var(--red)}
+.alert-success{background:rgba(62,207,142,.1);border-color:rgba(62,207,142,.3);color:var(--green)}
+.alert-info{background:rgba(91,141,239,.1);border-color:rgba(91,141,239,.3);color:var(--blue)}
+.alert-warning{background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.3);color:var(--accent)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.badge-green{background:rgba(62,207,142,.15);color:var(--green)}
+.badge-red{background:rgba(244,100,95,.15);color:var(--red)}
+.badge-yellow{background:rgba(245,200,66,.15);color:var(--accent)}
+.badge-blue{background:rgba(91,141,239,.15);color:var(--blue)}
+.badge-purple{background:rgba(155,114,232,.15);color:var(--purple)}
+.badge-gray{background:rgba(139,145,168,.15);color:var(--text2)}
+
+/* TABLES */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 12px;color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid rgba(46,51,72,.5);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:18px}
+.card-title{font-family:'DM Serif Display',serif;font-size:17px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:22px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card.yellow::before{background:var(--accent)}
+.stat-card.green::before{background:var(--green)}
+.stat-card.red::before{background:var(--red)}
+.stat-card.blue::before{background:var(--blue)}
+.stat-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.stat-val{font-size:22px;font-weight:600;font-family:'DM Serif Display',serif}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:3px}
+
+/* MISC */
+.empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:14px}
+.progress{background:var(--bg3);border-radius:4px;height:6px;overflow:hidden}
+.progress-bar{height:100%;border-radius:4px;background:var(--green)}
+.member-row{display:flex;align-items:center;gap:8px}
+.avatar{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:11px;flex-shrink:0}
+.c0{background:#5b8def22;color:#5b8def}.c1{background:#9b72e822;color:#9b72e8}.c2{background:#f5c84222;color:#f5c842}.c3{background:#3ecf8e22;color:#3ecf8e}.c4{background:#f4645f22;color:#f4645f}.c5{background:#e8a02022;color:#e8a020}
+
+/* TABS */
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;background:var(--bg3);padding:5px;border-radius:10px;border:1px solid var(--border)}
+.tab{padding:8px 18px;font-size:13px;cursor:pointer;color:var(--text2);border-radius:7px;white-space:nowrap;user-select:none;font-weight:500;transition:all .15s}
+.tab:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.tab.active{color:#0a0c12;background:var(--accent);font-weight:600}
+
+/* SPINNER */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(26,20,0,.3);border-top-color:#1a1400;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== SETUP ===== */
+#screen-setup{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.setup-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:40px;width:100%;max-width:480px}
+
+/* ===== AUTH ===== */
+#screen-auth{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:36px;width:100%;max-width:420px}
+.logo{font-family:'DM Serif Display',serif;font-size:36px;color:var(--accent);text-align:center;margin-bottom:6px}
+.tagline{text-align:center;font-size:13px;color:var(--text3);margin-bottom:28px}
+.auth-tabs{display:flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:22px}
+.auth-tab{flex:1;padding:10px;text-align:center;font-size:14px;cursor:pointer;background:var(--bg3);color:var(--text2);transition:all .15s}
+.auth-tab.active{background:var(--accent);color:#1a1400;font-weight:600}
+.al{border-radius:var(--radius-sm);padding:10px 13px;font-size:13px;margin-bottom:12px;border:1px solid}
+.al-e{background:rgba(244,100,95,.1);border-color:rgba(244,100,95,.3);color:var(--red)}
+.al-s{background:rgba(62,207,142,.1);border-color:rgba(62,207,142,.3);color:var(--green)}
+
+/* ===== APP LAYOUT ===== */
+#screen-app{display:flex;min-height:100vh}
+#sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .3s;overflow-y:auto}
+.sb-header{padding:20px 16px 12px;border-bottom:1px solid var(--border)}
+.sb-asso{font-family:'DM Serif Display',serif;font-size:22px;color:var(--accent)}
+.sb-plan{font-size:11px;color:var(--text3);margin-top:2px}
+.sb-user{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:rgba(245,200,66,.15);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.nav-section{padding:8px 0}
+.nav-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:6px 16px 3px;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 16px;cursor:pointer;border-left:3px solid transparent;font-size:13px;color:var(--text2);transition:all .15s;user-select:none}
+.nav-item:hover{color:var(--text);background:var(--bg3)}
+.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(245,200,66,.07)}
+.nav-item svg{width:15px;height:15px;flex-shrink:0}
+.sb-footer{padding:12px 16px;border-top:1px solid var(--border);margin-top:auto}
+#main{margin-left:240px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:58px;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:50}
+.topbar-title{font-weight:600;font-size:15px}
+#hamburger{display:none;background:none;border:none;color:var(--text);cursor:pointer;padding:4px}
+.page-content{padding:24px;flex:1}
+.page{display:none}
+.page.active{display:block}
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
+
+/* MODALS */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal-title{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:20px}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+
+@media(max-width:768px){
+  #sidebar{transform:translateX(-100%)}
+  #sidebar.open{transform:translateX(0)}
+  #main{margin-left:0}
+  #hamburger{display:block}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== LANDING PAGE ===== -->
+<div id="screen-landing">
+<style>
+#screen-landing{background:#0a0c12;color:#f0f2f8;font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+.ln-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:68px;background:rgba(10,12,18,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(245,200,66,.08)}
+.ln-logo{font-family:'DM Serif Display',serif;font-size:28px;color:#f5c842;letter-spacing:-1px}
+.ln-nav-links{display:flex;gap:28px;align-items:center}
+.ln-nav-links a{font-size:14px;color:#8b91a8;cursor:pointer;transition:color .15s}
+.ln-nav-links a:hover{color:#f0f2f8}
+.ln-btn-cta{background:#f5c842;color:#0a0c12;padding:9px 22px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s}
+.ln-btn-cta:hover{background:#e8a020;transform:translateY(-1px)}
+.ln-btn-ghost{background:none;border:1px solid rgba(245,200,66,.3);color:#f5c842;padding:9px 22px;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.ln-btn-ghost:hover{background:rgba(245,200,66,.08)}
+
+/* HERO */
+.ln-hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:100px 5% 60px;position:relative;overflow:hidden}
+.ln-hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(245,200,66,.07) 0%,transparent 70%);pointer-events:none}
+.ln-hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(245,200,66,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(245,200,66,.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+.ln-hero-content{position:relative;max-width:760px}
+.ln-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.2);color:#f5c842;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:28px}
+.ln-h1{font-family:'DM Serif Display',serif;font-size:clamp(40px,6vw,72px);line-height:1.1;margin-bottom:22px;letter-spacing:-2px}
+.ln-h1 em{color:#f5c842;font-style:normal}
+.ln-sub{font-size:18px;color:#8b91a8;line-height:1.7;margin-bottom:38px;max-width:560px;margin-left:auto;margin-right:auto}
+.ln-hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.ln-btn-big{background:#f5c842;color:#0a0c12;padding:14px 32px;border-radius:10px;font-weight:700;font-size:16px;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s}
+.ln-btn-big:hover{background:#e8a020;transform:translateY(-2px);box-shadow:0 8px 30px rgba(245,200,66,.25)}
+.ln-btn-big-ghost{background:none;border:1px solid rgba(255,255,255,.15);color:#f0f2f8;padding:14px 32px;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.ln-btn-big-ghost:hover{border-color:rgba(245,200,66,.4);color:#f5c842}
+.ln-hero-stats{display:flex;gap:48px;justify-content:center;margin-top:60px;flex-wrap:wrap}
+.ln-stat{text-align:center}
+.ln-stat-n{font-family:'DM Serif Display',serif;font-size:36px;color:#f5c842}
+.ln-stat-l{font-size:13px;color:#5a607a;margin-top:2px}
+
+/* FEATURES */
+.ln-section{padding:90px 5%}
+.ln-section-label{font-size:12px;color:#f5c842;text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-bottom:12px;text-align:center}
+.ln-section-title{font-family:'DM Serif Display',serif;font-size:clamp(28px,4vw,44px);text-align:center;margin-bottom:14px;letter-spacing:-1px}
+.ln-section-sub{text-align:center;color:#8b91a8;font-size:16px;margin-bottom:56px;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.7}
+.ln-features{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;max-width:1100px;margin:0 auto}
+.ln-feat{background:#12151f;border:1px solid #1e2230;border-radius:14px;padding:28px;transition:all .2s;position:relative;overflow:hidden}
+.ln-feat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#f5c842,transparent);opacity:0;transition:opacity .2s}
+.ln-feat:hover{border-color:rgba(245,200,66,.2);transform:translateY(-3px)}
+.ln-feat:hover::before{opacity:1}
+.ln-feat-icon{width:44px;height:44px;background:rgba(245,200,66,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px}
+.ln-feat-title{font-weight:700;font-size:16px;margin-bottom:8px}
+.ln-feat-desc{font-size:14px;color:#8b91a8;line-height:1.6}
+
+/* PRICING */
+.ln-pricing{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:900px;margin:0 auto}
+.ln-plan{background:#12151f;border:1px solid #1e2230;border-radius:16px;padding:32px;position:relative;transition:all .2s}
+.ln-plan.featured{border-color:rgba(245,200,66,.4);background:linear-gradient(135deg,#12151f 0%,#1a1d0f 100%)}
+.ln-plan.featured::before{content:'Populaire';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#f5c842;color:#0a0c12;font-size:11px;font-weight:700;padding:3px 14px;border-radius:20px;letter-spacing:.5px}
+.ln-plan-name{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#8b91a8;font-weight:600;margin-bottom:8px}
+.ln-plan-price{font-family:'DM Serif Display',serif;font-size:48px;color:#f0f2f8;line-height:1;margin-bottom:4px}
+.ln-plan-price span{font-size:16px;color:#8b91a8;font-family:'DM Sans',sans-serif;font-weight:400}
+.ln-plan-desc{font-size:13px;color:#5a607a;margin-bottom:24px}
+.ln-plan-features{list-style:none;margin-bottom:28px}
+.ln-plan-features li{font-size:14px;color:#8b91a8;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:8px}
+.ln-plan-features li::before{content:'✓';color:#f5c842;font-weight:700;flex-shrink:0}
+.ln-plan-features li.no::before{content:'✗';color:#5a607a}
+.ln-plan-features li.no{color:#5a607a}
+.ln-plan-btn{width:100%;padding:12px;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;border:none}
+.ln-plan.featured .ln-plan-btn{background:#f5c842;color:#0a0c12}
+.ln-plan.featured .ln-plan-btn:hover{background:#e8a020}
+.ln-plan:not(.featured) .ln-plan-btn{background:none;border:1px solid #2e3348;color:#f0f2f8}
+.ln-plan:not(.featured) .ln-plan-btn:hover{border-color:rgba(245,200,66,.3);color:#f5c842}
+
+/* TESTIMONIALS */
+.ln-testimonials{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;max-width:1000px;margin:0 auto}
+.ln-testi{background:#12151f;border:1px solid #1e2230;border-radius:14px;padding:28px}
+.ln-testi-stars{color:#f5c842;font-size:14px;margin-bottom:14px;letter-spacing:2px}
+.ln-testi-text{font-size:15px;color:#c8ccd8;line-height:1.7;margin-bottom:20px;font-style:italic}
+.ln-testi-author{display:flex;align-items:center;gap:12px}
+.ln-testi-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.ln-testi-name{font-weight:600;font-size:14px}
+.ln-testi-role{font-size:12px;color:#5a607a}
+
+/* FOOTER */
+.ln-footer{background:#0a0c12;border-top:1px solid #1e2230;padding:48px 5%;text-align:center}
+.ln-footer-logo{font-family:'DM Serif Display',serif;font-size:32px;color:#f5c842;margin-bottom:12px}
+.ln-footer-sub{font-size:14px;color:#5a607a;margin-bottom:28px}
+.ln-footer-copy{font-size:12px;color:#3a3f54}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.ln-hero-content{animation:fadeUp .7s ease both}
+.ln-badge{animation:fadeUp .5s ease both}
+</style>
+
+<!-- NAV -->
+<nav class="ln-nav">
+  <div class="ln-logo">Mboa</div>
+  <div class="ln-nav-links">
+    <a onclick="document.getElementById('ln-features').scrollIntoView({behavior:'smooth'})">Fonctionnalités</a>
+    <a onclick="document.getElementById('ln-pricing').scrollIntoView({behavior:'smooth'})">Tarifs</a>
+    <a onclick="document.getElementById('ln-testi').scrollIntoView({behavior:'smooth'})">Témoignages</a>
+    <button class="ln-btn-ghost" onclick="showSS('auth')">Se connecter</button>
+    <button class="ln-btn-cta" onclick="showSS('auth')">Essai gratuit →</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="ln-hero">
+  <div class="ln-hero-bg"></div>
+  <div class="ln-hero-grid"></div>
+  <div class="ln-hero-content">
+    <div class="ln-badge">✦ Gestion d'association simplifiée</div>
+    <h1 class="ln-h1">Gérez votre association<br>comme un <em>pro</em></h1>
+    <p class="ln-sub">Mboa centralise membres, cotisations, réunions, fonds et finances en un seul outil simple, accessible depuis n'importe quel appareil.</p>
+    <div class="ln-hero-btns">
+      <button class="ln-btn-big" onclick="showSS('auth')">Démarrer gratuitement</button>
+      <button class="ln-btn-big-ghost" onclick="document.getElementById('ln-features').scrollIntoView({behavior:'smooth'})">Découvrir →</button>
+    </div>
+    <div class="ln-hero-stats">
+      <div class="ln-stat"><div class="ln-stat-n">100%</div><div class="ln-stat-l">En ligne</div></div>
+      <div class="ln-stat"><div class="ln-stat-n">0€</div><div class="ln-stat-l">Pour commencer</div></div>
+      <div class="ln-stat"><div class="ln-stat-n">+15</div><div class="ln-stat-l">Modules inclus</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="ln-section" id="ln-features" style="background:#0d0f18">
+  <div class="ln-section-label">Fonctionnalités</div>
+  <h2 class="ln-section-title">Tout ce dont vous avez besoin</h2>
+  <p class="ln-section-sub">De la gestion des membres aux finances avancées, Mboa couvre tous les besoins de votre association.</p>
+  <div class="ln-features">
+    <div class="ln-feat"><div class="ln-feat-icon">👥</div><div class="ln-feat-title">Gestion des membres</div><div class="ln-feat-desc">Ajoutez, modifiez et suivez vos membres avec statuts, contacts et historiques complets.</div></div>
+    <div class="ln-feat"><div class="ln-feat-icon">💳</div><div class="ln-feat-title">Cotisations</div><div class="ln-feat-desc">Suivez les cotisations mensuelles, marquez les paiements et visualisez les impayés en un coup d'œil.</div></div>
+    <div class="ln-feat"><div class="ln-feat-icon">📅</div><div class="ln-feat-title">Réunions & Présences</div><div class="ln-feat-desc">Planifiez vos réunions, enregistrez les présences et générez automatiquement retards et amendes.</div></div>
+    <div class="ln-feat"><div class="ln-feat-icon">💰</div><div class="ln-feat-title">Fonds & Trésorerie</div><div class="ln-feat-desc">Fond d'adhésion, fond caisse, fond cotisation — tous suivis en temps réel avec journal complet.</div></div>
+    <div class="ln-feat"><div class="ln-feat-icon">🤝</div><div class="ln-feat-title">Dons & Prêts</div><div class="ln-feat-desc">Accordez des dons et prêts aux membres, gérez les remboursements répartis automatiquement.</div></div>
+    <div class="ln-feat"><div class="ln-feat-icon">📊</div><div class="ln-feat-title">Comptabilité</div><div class="ln-feat-desc">Journal financier annuel, export CSV, impression — une vue claire de toutes vos opérations.</div></div>
+    <div class="ln-feat"><div class="ln-feat-icon">🔔</div><div class="ln-feat-title">Alertes intelligentes</div><div class="ln-feat-desc">Retards impayés, amendes, remboursements en souffrance — Mboa vous tient informé en permanence.</div></div>
+    <div class="ln-feat"><div class="ln-feat-icon">📈</div><div class="ln-feat-title">Prêts avec intérêts</div><div class="ln-feat-desc">Calculez automatiquement les intérêts fixes ou mensuels, suivez les échéances et remboursements.</div></div>
+    <div class="ln-feat"><div class="ln-feat-icon">📱</div><div class="ln-feat-title">100% en ligne</div><div class="ln-feat-desc">Accessible depuis n'importe quel appareil, n'importe où. Aucune installation requise.</div></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="ln-section" id="ln-pricing">
+  <div class="ln-section-label">Tarifs</div>
+  <h2 class="ln-section-title">Simple et transparent</h2>
+  <p class="ln-section-sub">Commencez gratuitement, évoluez selon vos besoins. Aucune carte bancaire requise pour démarrer.</p>
+  <div class="ln-pricing">
+    <div class="ln-plan">
+      <div class="ln-plan-name">Gratuit</div>
+      <div class="ln-plan-price">0€<span>/mois</span></div>
+      <div class="ln-plan-desc">Pour les petites associations qui débutent</div>
+      <ul class="ln-plan-features">
+        <li>Jusqu'à 10 membres</li>
+        <li>Tous les modules inclus</li>
+        <li>Cotisations & adhésions</li>
+        <li>Réunions & présences</li>
+        <li class="no">Dons & prêts</li>
+        <li class="no">Export de données</li>
+        <li class="no">Support prioritaire</li>
+      </ul>
+      <button class="ln-plan-btn" onclick="showSS('auth')">Commencer gratuitement</button>
+    </div>
+    <div class="ln-plan featured">
+      <div class="ln-plan-name">Premium</div>
+      <div class="ln-plan-price">5€<span>/mois</span></div>
+      <div class="ln-plan-desc">Pour les associations en croissance</div>
+      <ul class="ln-plan-features">
+        <li>Jusqu'à 50 membres</li>
+        <li>Tous les modules inclus</li>
+        <li>Cotisations & adhésions</li>
+        <li>Réunions & présences</li>
+        <li>Dons & prêts</li>
+        <li>Export de données</li>
+        <li class="no">Support prioritaire</li>
+      </ul>
+      <button class="ln-plan-btn" onclick="showSS('auth')">Choisir Premium</button>
+    </div>
+    <div class="ln-plan">
+      <div class="ln-plan-name">Pro</div>
+      <div class="ln-plan-price">10€<span>/mois</span></div>
+      <div class="ln-plan-desc">Pour les grandes associations actives</div>
+      <ul class="ln-plan-features">
+        <li>Membres illimités</li>
+        <li>Tous les modules inclus</li>
+        <li>Cotisations & adhésions</li>
+        <li>Réunions & présences</li>
+        <li>Dons & prêts</li>
+        <li>Export de données</li>
+        <li>Support prioritaire</li>
+      </ul>
+      <button class="ln-plan-btn" onclick="showSS('auth')">Choisir Pro</button>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="ln-section" id="ln-testi" style="background:#0d0f18">
+  <div class="ln-section-label">Témoignages</div>
+  <h2 class="ln-section-title">Ils nous font confiance</h2>
+  <p class="ln-section-sub">Des associations de toutes tailles utilisent Mboa pour simplifier leur gestion au quotidien.</p>
+  <div class="ln-testimonials">
+    <div class="ln-testi">
+      <div class="ln-testi-stars">★★★★★</div>
+      <p class="ln-testi-text">"Avant Mboa, on gérait tout sur des feuilles Excel. Maintenant en 5 minutes on sait où on en est : cotisations, fonds, retards... C'est une révolution pour notre bureau !"</p>
+      <div class="ln-testi-author">
+        <div class="ln-testi-av" style="background:rgba(62,207,142,.15);color:#3ecf8e">AM</div>
+        <div><div class="ln-testi-name">Aminata M.</div><div class="ln-testi-role">Trésorière, Association Solidarité Dakar</div></div>
+      </div>
+    </div>
+    <div class="ln-testi">
+      <div class="ln-testi-stars">★★★★★</div>
+      <p class="ln-testi-text">"Le module réunions avec présences automatiques est excellent. On économise une heure à chaque assemblée. Et le suivi des amendes pousse vraiment les membres à être ponctuels !"</p>
+      <div class="ln-testi-author">
+        <div class="ln-testi-av" style="background:rgba(91,141,239,.15);color:#5b8def">JK</div>
+        <div><div class="ln-testi-name">Jean-Paul K.</div><div class="ln-testi-role">Président, Tontine Espoir 237</div></div>
+      </div>
+    </div>
+    <div class="ln-testi">
+      <div class="ln-testi-stars">★★★★★</div>
+      <p class="ln-testi-text">"La gestion des prêts avec intérêts est parfaite pour notre groupe. Le calcul automatique des échéances et la répartition des remboursements nous font gagner un temps fou."</p>
+      <div class="ln-testi-author">
+        <div class="ln-testi-av" style="background:rgba(245,200,66,.15);color:#f5c842">FN</div>
+        <div><div class="ln-testi-name">Fatou N.</div><div class="ln-testi-role">Secrétaire, Groupe Entraide Paris</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section style="padding:90px 5%;text-align:center;background:linear-gradient(135deg,rgba(245,200,66,.05) 0%,transparent 60%)">
+  <h2 style="font-family:'DM Serif Display',serif;font-size:clamp(28px,4vw,48px);margin-bottom:16px;letter-spacing:-1px">Prêt à moderniser votre association ?</h2>
+  <p style="color:#8b91a8;font-size:17px;margin-bottom:36px">Rejoignez des dizaines d'associations qui font confiance à Mboa. C'est gratuit pour commencer.</p>
+  <button class="ln-btn-big" onclick="showSS('auth')">Créer mon espace gratuit →</button>
+</section>
+
+<!-- FOOTER -->
+<footer class="ln-footer">
+  <div class="ln-footer-logo">Mboa</div>
+  <div class="ln-footer-sub">La gestion d'association pensée pour l'Afrique et sa diaspora.</div>
+  <div style="display:flex;gap:24px;justify-content:center;margin-bottom:24px">
+    <a onclick="showSS('auth')" style="font-size:13px;color:#5a607a;cursor:pointer">Se connecter</a>
+    <a onclick="showSS('auth')" style="font-size:13px;color:#5a607a;cursor:pointer">Créer un compte</a>
+    <a onclick="document.getElementById('ln-pricing').scrollIntoView({behavior:'smooth'})" style="font-size:13px;color:#5a607a;cursor:pointer">Tarifs</a>
+  </div>
+  <div class="ln-footer-copy">© 2025 Mboa · Tous droits réservés</div>
+</footer>
+</div>
+<!-- ===== FIN LANDING PAGE ===== -->
+
+<!-- ===== SETUP ===== -->
+<div id="screen-setup" class="hidden">
+  <div class="setup-box">
+    <div class="logo">Mboa</div>
+    <p class="tagline">Configuration initiale</p>
+    <div id="setup-err" class="al al-e hidden"></div>
+    <div class="form-group"><label>Project URL Supabase</label><input type="url" id="s-url" placeholder="https://xxx.supabase.co"></div>
+    <div class="form-group"><label>Clé anon publique</label><input type="text" id="s-key" placeholder="eyJ..."></div>
+    <button class="btn btn-primary" onclick="saveSetup()">Connecter →</button>
+    <button onclick="resetSetup()" style="margin-top:10px;width:100%;background:none;border:1px solid var(--border);color:var(--text3);border-radius:6px;padding:8px;font-size:12px;cursor:pointer">Réinitialiser</button>
+  </div>
+</div>
+
+<!-- ===== AUTH ===== -->
+<div id="screen-auth" class="hidden">
+  <div class="auth-box">
+    <div class="logo">Mboa</div>
+    <p class="tagline">Gestion d'association professionnelle</p>
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="authTab('login')">Connexion</div>
+      <div class="auth-tab" onclick="authTab('register')">Créer un compte</div>
+    </div>
+    <div id="auth-msg" class="hidden"></div>
+    <div id="f-login">
+      <div class="form-group"><label>Email</label><input type="email" id="li-email" placeholder="vous@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="form-group"><label>Mot de passe</label><input type="password" id="li-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn btn-primary" onclick="doLogin()">Se connecter</button>
+      <div style="text-align:center;margin-top:12px"><a href="#" onclick="forgotPwd()" style="font-size:13px;color:var(--text3)">Mot de passe oublié ?</a></div>
+    </div>
+    <div id="f-register" class="hidden">
+      <div class="form-group"><label>Nom de l'association</label><input type="text" id="rg-asso" placeholder="Ex: Association Mboa"></div>
+      <div class="form-group"><label>Votre prénom</label><input type="text" id="rg-prenom" placeholder="Jean"></div>
+      <div class="form-group"><label>Votre nom</label><input type="text" id="rg-nom" placeholder="Dupont"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="rg-email" placeholder="vous@email.com"></div>
+      <div class="form-group"><label>Mot de passe (min. 8 caractères)</label><input type="password" id="rg-pwd" placeholder="••••••••"></div>
+      <button class="btn btn-primary" onclick="doRegister()">Créer mon espace gratuit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="screen-app" class="hidden">
+  <nav id="sidebar">
+    <div class="sb-header">
+      <div class="sb-asso" id="sb-nom">Mboa</div>
+      <div class="sb-plan" id="sb-plan">Plan gratuit</div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-av">?</div>
+      <div>
+        <div style="font-size:13px;font-weight:500" id="sb-user">—</div>
+        <div style="font-size:11px;color:var(--text3)" id="sb-role">Admin</div>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <div class="nav-item active" onclick="goto('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Tableau de bord</div>
+      <div class="nav-item" onclick="goto('membres')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Membres</div>
+      <div class="nav-item" onclick="goto('reunions')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Réunions</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Finances</div>
+      <div class="nav-item" onclick="goto('cotisations')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Cotisations</div>
+      <div class="nav-item" onclick="goto('adhesion')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg>Adhésion</div>
+      <div class="nav-item" onclick="goto('retards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Retards</div>
+      <div class="nav-item" onclick="goto('amendes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>Amendes</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Fonds</div>
+      <div class="nav-item" onclick="goto('dons')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Dons</div>
+      <div class="nav-item" onclick="goto('prets')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Prêts</div>
+      <div class="nav-item" onclick="goto('pret-interet')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/><circle cx="19" cy="5" r="3"/></svg>Prêts + Intérêts</div>
+      <div class="nav-item" onclick="goto('fond-caisse')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4"/><path d="M2 13v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6"/><circle cx="12" cy="10" r="2"/></svg>Fond Caisse</div>
+      <div class="nav-item" onclick="goto('fond-cotisation')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Fond Cotisation</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Admin</div>
+      <div class="nav-item" onclick="goto('comptabilite')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Comptabilité</div>
+      <div class="nav-item" onclick="goto('alertes')" id="nav-alertes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Alertes <span id="badge-alertes" style="display:none;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px">0</span></div>
+      <div class="nav-item" onclick="goto('mon-compte')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg>Mon Compte</div>
+      <div class="nav-item" onclick="goto('configuration')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>Configuration</div>
+      <div class="nav-item" id="nav-superadmin" style="display:none;color:var(--accent);border-top:1px solid var(--border);margin-top:4px" onclick="goto('superadmin')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>⚡ Super Admin</div>
+    </div>
+    <div class="sb-footer">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Mboa · <span id="sb-count">0</span> membre(s)</div>
+      <button onclick="doLogout()" style="width:100%;background:none;border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:7px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif" onmouseover="this.style.color='var(--red)';this.style.borderColor='rgba(244,100,95,.4)'" onmouseout="this.style.color='var(--text2)';this.style.borderColor='var(--border)'">Déconnexion</button>
+    </div>
+  </nav>
+
+  <div id="overlay" onclick="closeSidebar()"></div>
+
+  <div id="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button id="hamburger" onclick="toggleSidebar()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <span class="topbar-title" id="page-title">Tableau de bord</span>
+      </div>
+      <span id="topbar-date" style="font-size:12px;color:var(--text3)"></span>
+    </div>
+    <div class="page-content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div id="dash-warn"></div>
+        <div class="stat-grid" id="dash-stats">
+          <div class="stat-card yellow"><div class="stat-label">Membres actifs</div><div class="stat-val">—</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+          <div class="card"><div class="card-title">Fonds adhésion par membre</div><div id="dash-fonds"><div class="empty">Chargement…</div></div></div>
+          <div class="card"><div class="card-title">Résumé financier</div><div id="dash-resume"><div class="empty">Chargement…</div></div></div>
+        </div>
+      </div>
+
+      <!-- MEMBRES -->
+      <div class="page" id="page-membres">
+        <div class="card">
+          <div class="card-title">Membres <button class="btn btn-primary btn-sm" onclick="openModalMembre()">+ Ajouter</button></div>
+          <div class="table-wrap"><table><thead><tr><th>Membre</th><th>Téléphone</th><th>Email</th><th>Statut</th><th>Fond adhésion</th><th>Actions</th></tr></thead><tbody id="m-tbody"><tr><td colspan="6"><div class="empty">Chargement…</div></td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- COTISATIONS -->
+      <div class="page" id="page-cotisations">
+        <div class="tabs">
+          <div class="tab active" onclick="swTab(this,'tc-l')">Liste</div>
+          <div class="tab" onclick="swTab(this,'tc-n')">Nouvelle</div>
+        </div>
+        <div id="tc-l">
+          <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+            <select id="cot-fm" onchange="rCots()" style="width:200px"><option value="">Tous les membres</option></select>
+            <select id="cot-fs" onchange="rCots()" style="width:140px"><option value="">Tous statuts</option><option value="paye">Payé</option><option value="impaye">Impayé</option></select>
+            <span id="cot-total" style="font-size:13px;color:var(--green);font-weight:600;margin-left:auto"></span>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>Membre</th><th>Mois</th><th>Montant</th><th>Date paiement</th><th>Statut</th><th>Action</th></tr></thead><tbody id="cot-tbody"></tbody></table></div>
+        </div>
+        <div id="tc-n" class="hidden card">
+          <div class="form-grid">
+            <div class="form-group"><label>Membre</label><select id="cot-m"></select></div>
+            <div class="form-group"><label>Mois</label><input type="month" id="cot-mo"></div>
+            <div class="form-group"><label>Montant (EUR)</label><input type="number" id="cot-mt" step="0.01" placeholder="0.00"></div>
+            <div class="form-group"><label>Date paiement</label><input type="date" id="cot-dt"></div>
+            <div class="form-group"><label>Statut</label><select id="cot-st"><option value="paye">Payé</option><option value="impaye">Impayé</option></select></div>
+          </div>
+          <div class="form-group"><label>Note</label><textarea id="cot-note" rows="2"></textarea></div>
+          <button class="btn btn-primary" style="width:auto" onclick="addCot()">Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- ADHESION -->
+      <div class="page" id="page-adhesion">
+        <div class="tabs">
+          <div class="tab active" onclick="swTab(this,'ta-f')">Fonds</div>
+          <div class="tab" onclick="swTab(this,'ta-l')">Paiements</div>
+          <div class="tab" onclick="swTab(this,'ta-n')">Nouveau</div>
+        </div>
+        <div id="ta-f">
+          <div class="table-wrap"><table><thead><tr><th>Membre</th><th>Solde fond adhésion</th></tr></thead><tbody id="adh-fonds-tbody"></tbody></table></div>
+        </div>
+        <div id="ta-l" class="hidden">
+          <div class="table-wrap"><table><thead><tr><th>Membre</th><th>Année</th><th>Montant</th><th>Date</th><th>Note</th><th>Action</th></tr></thead><tbody id="adh-tbody"></tbody></table></div>
+        </div>
+        <div id="ta-n" class="hidden card">
+          <div class="form-grid">
+            <div class="form-group"><label>Membre</label><select id="adh-m"></select></div>
+            <div class="form-group"><label>Année</label><input type="number" id="adh-an" placeholder="2025"></div>
+            <div class="form-group"><label>Montant (EUR)</label><input type="number" id="adh-mt" step="0.01"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="adh-dt"></div>
+          </div>
+          <div class="form-group"><label>Note</label><textarea id="adh-note" rows="2"></textarea></div>
+          <button class="btn btn-primary" style="width:auto" onclick="addAdh()">Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- RETARDS -->
+      <div class="page" id="page-retards">
+        <div class="tabs">
+          <div class="tab active" onclick="swTab(this,'tr-l')">Liste</div>
+          <div class="tab" onclick="swTab(this,'tr-n')">Nouveau</div>
+        </div>
+        <div id="tr-l">
+          <div class="table-wrap"><table><thead><tr><th>Membre</th><th>Motif</th><th>Montant</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="ret-tbody"></tbody></table></div>
+        </div>
+        <div id="tr-n" class="hidden card">
+          <div class="form-grid">
+            <div class="form-group"><label>Membre</label><select id="ret-m"></select></div>
+            <div class="form-group"><label>Motif</label><input type="text" id="ret-motif" placeholder="Ex: Retard réunion"></div>
+            <div class="form-group"><label>Montant (EUR)</label><input type="number" id="ret-mt" step="0.01"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="ret-dt"></div>
+            <div class="form-group"><label>Statut</label><select id="ret-st"><option value="impaye">Impayé</option><option value="paye">Payé</option></select></div>
+          </div>
+          <button class="btn btn-primary" style="width:auto" onclick="addRet()">Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- AMENDES -->
+      <div class="page" id="page-amendes">
+        <div class="tabs">
+          <div class="tab active" onclick="swTab(this,'tam-l')">Liste</div>
+          <div class="tab" onclick="swTab(this,'tam-n')">Nouvelle</div>
+        </div>
+        <div id="tam-l">
+          <div class="table-wrap"><table><thead><tr><th>Membre</th><th>Motif</th><th>Montant</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="am-tbody"></tbody></table></div>
+        </div>
+        <div id="tam-n" class="hidden card">
+          <div class="form-grid">
+            <div class="form-group"><label>Membre</label><select id="am-membre"></select></div>
+            <div class="form-group"><label>Motif</label><input type="text" id="am-motif" placeholder="Ex: Absence réunion"></div>
+            <div class="form-group"><label>Montant (EUR)</label><input type="number" id="am-mt" step="0.01"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="am-dt"></div>
+            <div class="form-group"><label>Statut</label><select id="am-st"><option value="impaye">Impayé</option><option value="paye">Payé</option></select></div>
+          </div>
+          <button class="btn btn-primary" style="width:auto" onclick="addAm()">Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- DONS -->
+      <div class="page" id="page-dons">
+        <div class="tabs">
+          <div class="tab active" onclick="swTab(this,'td-l')">Dons accordés</div>
+          <div class="tab" onclick="swTab(this,'td-r')">Remboursements</div>
+          <div class="tab" onclick="swTab(this,'td-n')">Nouveau don</div>
+        </div>
+        <div id="td-l">
+          <div class="table-wrap"><table><thead><tr><th>Bénéficiaire</th><th>Montant</th><th>Date</th><th>Motif</th><th>Action</th></tr></thead><tbody id="don-tbody"></tbody></table></div>
+        </div>
+        <div id="td-r" class="hidden">
+          <div class="table-wrap"><table><thead><tr><th>Membre</th><th>Don</th><th>Montant</th><th>Échéance</th><th>Statut</th><th>Action</th></tr></thead><tbody id="donr-tbody"></tbody></table></div>
+        </div>
+        <div id="td-n" class="hidden card">
+          <div class="form-grid">
+            <div class="form-group"><label>Bénéficiaire</label><select id="don-benef"></select></div>
+            <div class="form-group"><label>Montant total (EUR)</label><input type="number" id="don-mt" step="0.01"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="don-dt"></div>
+          </div>
+          <div class="form-group"><label>Motif</label><textarea id="don-motif" rows="2"></textarea></div>
+          <button class="btn btn-primary" style="width:auto" onclick="addDon()">Créer le don</button>
+        </div>
+      </div>
+
+      <!-- PRETS -->
+      <div class="page" id="page-prets">
+        <div class="tabs">
+          <div class="tab active" onclick="swTab(this,'tp-l')">Prêts accordés</div>
+          <div class="tab" onclick="swTab(this,'tp-r')">Remboursements</div>
+          <div class="tab" onclick="swTab(this,'tp-n')">Nouveau prêt</div>
+        </div>
+        <div id="tp-l">
+          <div class="table-wrap"><table><thead><tr><th>Bénéficiaire</th><th>Montant</th><th>Date</th><th>Motif</th><th>Statut</th><th>Action</th></tr></thead><tbody id="pret-tbody"></tbody></table></div>
+        </div>
+        <div id="tp-r" class="hidden">
+          <div class="table-wrap"><table><thead><tr><th>Membre</th><th>Prêt</th><th>Montant</th><th>Échéance</th><th>Statut</th><th>Action</th></tr></thead><tbody id="pretr-tbody"></tbody></table></div>
+        </div>
+        <div id="tp-n" class="hidden card">
+          <div class="form-grid">
+            <div class="form-group"><label>Bénéficiaire</label><select id="pret-benef"></select></div>
+            <div class="form-group"><label>Montant total (EUR)</label><input type="number" id="pret-mt" step="0.01"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="pret-dt"></div>
+          </div>
+          <div class="form-group"><label>Motif</label><textarea id="pret-motif" rows="2"></textarea></div>
+          <button class="btn btn-primary" style="width:auto" onclick="addPret()">Créer le prêt</button>
+        </div>
+      </div>
+
+      <!-- PRETS INTERETS -->
+      <div class="page" id="page-pret-interet">
+        <div class="tabs">
+          <div class="tab active" onclick="swTab(this,'tpi-l')">Prêts accordés</div>
+          <div class="tab" onclick="swTab(this,'tpi-n')">Nouveau prêt</div>
+        </div>
+        <div id="tpi-l">
+          <div class="table-wrap"><table><thead><tr><th>Bénéficiaire</th><th>Capital</th><th>Intérêts</th><th>Total dû</th><th>Taux</th><th>Durée</th><th>Date octroi</th><th>Échéance</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="pi-tbody"></tbody></table></div>
+        </div>
+        <div id="tpi-n" class="hidden card">
+          <div class="form-grid">
+            <div class="form-group"><label>Bénéficiaire</label><select id="pi-benef"></select></div>
+            <div class="form-group"><label>Capital (EUR)</label><input type="number" id="pi-capital" step="0.01" oninput="previewPretInteret()"></div>
+            <div class="form-group"><label>Type de taux</label><select id="pi-type" onchange="previewPretInteret()"><option value="fixe">Fixe</option><option value="mensuel">Mensuel</option></select></div>
+            <div class="form-group"><label>Taux (%)</label><input type="number" id="pi-taux" step="0.01" oninput="previewPretInteret()"></div>
+            <div class="form-group"><label>Durée (mois)</label><input type="number" id="pi-duree" value="12" oninput="previewPretInteret()"></div>
+            <div class="form-group"><label>Fond source</label><select id="pi-fond"><option value="caisse">Fond Caisse</option><option value="cotisation">Fond Cotisation</option></select></div>
+            <div class="form-group"><label>Date octroi</label><input type="date" id="pi-date"></div>
+          </div>
+          <div class="form-group"><label>Motif</label><textarea id="pi-motif" rows="2"></textarea></div>
+          <div id="pi-preview" style="margin-bottom:14px"></div>
+          <button class="btn btn-primary" style="width:auto" onclick="addPretInteret()">Accorder le prêt</button>
+        </div>
+      </div>
+
+      <!-- FOND CAISSE -->
+      <div class="page" id="page-fond-caisse">
+        <div class="tabs">
+          <div class="tab active" onclick="swTab(this,'tfc-l')">Journal</div>
+          <div class="tab" onclick="swTab(this,'tfc-n')">Nouvelle sortie</div>
+        </div>
+        <div id="tfc-l">
+          <div id="fc-solde" style="margin-bottom:14px"></div>
+          <div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Membre</th><th>Description</th><th>Entrée</th><th>Sortie</th></tr></thead><tbody id="fc-tbody"></tbody></table></div>
+        </div>
+        <div id="tfc-n" class="hidden card">
+          <div class="form-grid">
+            <div class="form-group"><label>Motif</label><input type="text" id="caisse-motif" placeholder="Ex: Achat matériel"></div>
+            <div class="form-group"><label>Montant (EUR)</label><input type="number" id="caisse-mt" step="0.01"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="caisse-dt"></div>
+          </div>
+          <button class="btn btn-primary" style="width:auto" onclick="addSortieCaisse()">Enregistrer la sortie</button>
+        </div>
+      </div>
+
+      <!-- FOND COTISATION -->
+      <div class="page" id="page-fond-cotisation">
+        <div class="tabs">
+          <div class="tab active" onclick="swTab(this,'tfcot-l')">Journal</div>
+          <div class="tab" onclick="swTab(this,'tfcot-n')">Virement vers membre</div>
+        </div>
+        <div id="tfcot-l">
+          <div id="fk-solde" style="margin-bottom:14px"></div>
+          <div class="table-wrap"><table><thead><tr><th>Date</th><th>Membre</th><th>Motif</th><th>Montant</th></tr></thead><tbody id="fk-tbody"></tbody></table></div>
+        </div>
+        <div id="tfcot-n" class="hidden card">
+          <div class="form-grid">
+            <div class="form-group"><label>Membre</label><select id="vir-membre"></select></div>
+            <div class="form-group"><label>Montant (EUR)</label><input type="number" id="vir-mt" step="0.01"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="vir-dt"></div>
+          </div>
+          <div class="form-group"><label>Motif</label><input type="text" id="vir-motif" placeholder="Ex: Remboursement don"></div>
+          <button class="btn btn-primary" style="width:auto" onclick="addVirement()">Effectuer le virement</button>
+        </div>
+      </div>
+
+      <!-- REUNIONS -->
+      <div class="page" id="page-reunions">
+        <div class="tabs">
+          <div class="tab active" onclick="swTab(this,'tr2-l')">Réunions</div>
+          <div class="tab" onclick="swTab(this,'tr2-n')">Nouvelle réunion</div>
+        </div>
+        <div id="tr2-l">
+          <div class="table-wrap"><table><thead><tr><th>Titre</th><th>Date</th><th>Présents</th><th>Absents</th><th>Retards</th><th>Action</th></tr></thead><tbody id="reun-tbody"></tbody></table></div>
+        </div>
+        <div id="tr2-n" class="hidden card">
+          <div class="form-grid">
+            <div class="form-group"><label>Titre</label><input type="text" id="reun-titre" placeholder="Ex: Réunion mensuelle janvier"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="reun-dt"></div>
+          </div>
+          <div class="form-group"><label>Membres présents</label><div id="reun-presences" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:4px"></div></div>
+          <div id="reun-retards-zone" style="margin-top:14px"></div>
+          <button class="btn btn-primary" style="width:auto;margin-top:14px" onclick="saveReunion()">Enregistrer la réunion</button>
+        </div>
+      </div>
+
+      <!-- COMPTABILITE -->
+      <div class="page" id="page-comptabilite">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap">
+          <select id="compta-annee" onchange="rCompta()" style="width:120px"></select>
+          <button onclick="exportCSV()" class="btn btn-secondary btn-sm">📥 Export CSV</button>
+          <button onclick="window.print()" class="btn btn-secondary btn-sm">🖨️ Imprimer</button>
+        </div>
+        <div id="compta-stats" class="stat-grid" style="margin-bottom:18px"></div>
+        <div class="card">
+          <div class="card-title">Journal des opérations</div>
+          <div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Membre</th><th>Description</th><th>Entrée</th><th>Sortie</th></tr></thead><tbody id="compta-tbody"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- ALERTES -->
+      <div class="page" id="page-alertes">
+        <div id="alertes-content"><div class="empty">Chargement…</div></div>
+      </div>
+
+      <!-- MON COMPTE -->
+      <div class="page" id="page-mon-compte">
+        <div style="margin-bottom:14px">
+          <select id="mc-select" onchange="rMC()" style="max-width:280px"></select>
+        </div>
+        <div id="mc-content"></div>
+      </div>
+
+      <!-- CONFIGURATION -->
+      <div class="page" id="page-configuration">
+        <div class="card">
+          <div class="card-title">Paramètres de l'association</div>
+          <div id="cf-plan" style="margin-bottom:16px"></div>
+          <div id="cf-msg" class="hidden"></div>
+          <div class="form-grid">
+            <div class="form-group"><label>Nom de l'association</label><input type="text" id="cf-nom"></div>
+            <div class="form-group"><label>Couleur accent</label><input type="color" id="cf-col"><input type="text" id="cf-col-hex" placeholder="#f5c842" style="margin-top:6px"></div>
+            <div class="form-group"><label>Heure réunion (HH:MM)</label><input type="text" id="cf-heure" placeholder="18:00"></div>
+            <div class="form-group"><label>Montant amende absence (EUR)</label><input type="number" id="cf-am" step="0.01"></div>
+            <div class="form-group"><label>Nb absences avant amende</label><input type="number" id="cf-nba"></div>
+            <div class="form-group"><label>Mois reset annuel</label><input type="number" id="cf-mr" min="1" max="12"></div>
+            <div class="form-group"><label>Durée remboursement (mois)</label><input type="number" id="cf-dr"></div>
+            <div class="form-group"><label>Tranche 1 max (HH:MM)</label><input type="text" id="cf-t1" placeholder="18:30"></div>
+            <div class="form-group"><label>Montant retard tranche 1 (EUR)</label><input type="number" id="cf-m1" step="0.01"></div>
+            <div class="form-group"><label>Tranche 2 max (HH:MM)</label><input type="text" id="cf-t2" placeholder="19:00"></div>
+            <div class="form-group"><label>Montant retard tranche 2 (EUR)</label><input type="number" id="cf-m2" step="0.01"></div>
+          </div>
+          <button class="btn btn-primary" style="width:auto" onclick="saveConf()">Sauvegarder</button>
+          <button onclick="exportData()" class="btn btn-secondary btn-sm" style="margin-left:10px">📦 Exporter données</button>
+        </div>
+      </div>
+
+      <!-- SUPER ADMIN -->
+      <div class="page" id="page-superadmin">
+        <div class="card">
+          <div class="card-title" style="color:var(--accent)">⚡ Super Admin — Toutes les associations</div>
+          <div id="sa-content"><div class="empty">Chargement…</div></div>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </div><!-- /main -->
+</div><!-- /screen-app -->
+
+<!-- MODAL MEMBRE -->
+<div class="modal" id="modal-m">
+  <div class="modal-box">
+    <div class="modal-title" id="mm-titre">Nouveau membre</div>
+    <input type="hidden" id="mm-id">
+    <div class="form-grid">
+      <div class="form-group"><label>Prénom</label><input type="text" id="mm-prenom"></div>
+      <div class="form-group"><label>Nom</label><input type="text" id="mm-nom"></div>
+      <div class="form-group"><label>Téléphone</label><input type="tel" id="mm-tel"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="mm-email"></div>
+      <div class="form-group"><label>Date adhésion</label><input type="date" id="mm-date"></div>
+      <div class="form-group"><label>Statut</label><select id="mm-statut"><option value="actif">Actif</option><option value="inactif">Inactif</option></select></div>
+    </div>
+    <div class="form-group"><label>Note</label><textarea id="mm-note" rows="2"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-m')">Annuler</button>
+      <button class="btn btn-primary btn-sm" onclick="saveMembre()">Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PAIEMENT -->
+<div class="modal" id="modal-pay">
+  <div class="modal-box">
+    <div class="modal-title">Confirmer le paiement</div>
+    <input type="hidden" id="pay-tb"><input type="hidden" id="pay-id">
+    <div class="form-group"><label>Date de paiement</label><input type="date" id="pay-dt"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-pay')">Annuler</button>
+      <button class="btn btn-primary btn-sm" onclick="confirmPay()">✓ Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REUNION DETAIL -->
+<div class="modal" id="modal-reun">
+  <div class="modal-box" style="max-width:600px">
+    <div class="modal-title" id="reun-det-titre">Détail réunion</div>
+    <div id="reun-det-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-reun')">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+var SB_URL = 'https://nkfzmzbteqrdbyjtgwsh.supabase.co';
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5rZnptemJ0ZXFyZGJ5anRnd3NoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNTcwNzEsImV4cCI6MjA5MzczMzA3MX0.L_kInjCx4gpTpe1LeiL8guEDMEjAwaBkj5oIiH5Hpkw';
+
+// ============================================================
+// STATE
+// ============================================================
+var sb = null, CU = null, CA = null, MC = [], FC = {}, CUD = null, IS_SUPER = false;
+var COLS = ['c0','c1','c2','c3','c4','c5'];
+
+// ============================================================
+// UTILS
+// ============================================================
+function E(id){return document.getElementById(id);}
+function sH(id,h){var e=E(id);if(e)e.innerHTML=h;}
+function gV(id){var e=E(id);return e?e.value.trim():'';}
+function td(){return new Date().toISOString().slice(0,10);}
+function fdD(d){return d?new Date(d).toLocaleDateString('fr-FR'):'--';}
+function fmt(n){return isNaN(+n)?'0,00':new Intl.NumberFormat('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2}).format(+n);}
+function addM(ds,n){var d=new Date(ds);d.setMonth(d.getMonth()+n);return d.toISOString().slice(0,10);}
+function ds2(yr){var d=new Date(yr,9,1);while(d.getDay()!==6)d.setDate(d.getDate()+1);d.setDate(d.getDate()+7);return d.toISOString().slice(0,10);}
+function saison(){var t=td(),yr=new Date().getFullYear();return t>=ds2(yr)?yr+1:yr;}
+function debut(){return ds2(saison()-1);}
+function dRemb(){return (CA&&CA.duree_remboursement_mois)||3;}
+function mCol(id){var i=MC.findIndex(function(x){return x.id===id;});return COLS[Math.max(0,i)%COLS.length];}
+function mNm(id){var m=MC.find(function(x){return x.id===id;});return m?(m.prenom+' '+m.nom):'?';}
+function mIn(id){var m=MC.find(function(x){return x.id===id;});return m?(m.prenom[0]+m.nom[0]).toUpperCase():'??';}
+function avEl(id){return '<div class="avatar '+mCol(id)+'">'+mIn(id)+'</div>';}
+function mChip(id){return '<div class="member-row">'+avEl(id)+'<span>'+mNm(id)+'</span></div>';}
+
+// ============================================================
+// SCREENS
+// ============================================================
+function showSS(name){
+  E('screen-landing').classList.add('hidden');
+  E('screen-setup').classList.add('hidden');
+  E('screen-auth').classList.add('hidden');
+  E('screen-app').classList.add('hidden');
+  if(name==='landing')E('screen-landing').classList.remove('hidden');
+  if(name==='setup')E('screen-setup').classList.remove('hidden');
+  if(name==='auth')E('screen-auth').classList.remove('hidden');
+  if(name==='app')E('screen-app').classList.remove('hidden');
+}
+function openMO(id){E(id).classList.add('open');}
+function closeMO(id){E(id).classList.remove('open');}
+function togSB(){var s=E('sidebar');s.classList.toggle('open');E('overlay').style.display=s.classList.contains('open')?'block':'none';}
+function closeSB(){E('sidebar').classList.remove('open');E('overlay').style.display='none';}
+function swT(el,id){
+  var target=E(id);if(!target)return;
+  var tabsEl=el.closest('.tabs');
+  var parent=tabsEl.parentElement;
+  Array.from(parent.children).forEach(function(c){
+    if(c===tabsEl)return;
+    c.classList.add('hidden');
+  });
+  target.classList.remove('hidden');
+  tabsEl.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');
+}
+
+// ALL ALIASES - HTML calls these, they delegate to real functions
+function goto(p){navTo(p);}
+function swTab(el,id){swT(el,id);}
+function toggleSidebar(){togSB();}
+function closeSidebar(){closeSB();}
+function saveSetup(){doSetup();}
+function resetSetup(){resetSU();}
+function forgotPwd(){dofPwd();}
+function authTab(t){aTab(t==='login'?0:1);}
+function closeModal(id){closeMO(id);}
+function openModalMembre(){openMM();}
+function addSortieCaisse(){addFC();}
+function addVirement(){addVir();}
+function saveReunion(){saveReun();}
+function addPretInteret(){addPI();}
+function previewPretInteret(){prvPI();}
+function renderCots(){rCots();}
+function renderCompta(){rCompta();}
+function renderMonCompte(){rMC();}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+var TITLES={dashboard:'Tableau de bord',membres:'Membres',cotisations:'Cotisations',adhesion:'Adhésion',retards:'Retards',amendes:'Amendes',dons:'Dons',prets:'Prêts simples','pret-interet':'Prêts + Intérêts','fond-caisse':'Fond Caisse','fond-cotisation':'Fond Cotisation',reunions:'Réunions',comptabilite:'Comptabilité',alertes:'Alertes','mon-compte':'Mon Compte',configuration:'Configuration',superadmin:'⚡ Super Admin'};
+function navTo(p){
+  document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');});
+  document.querySelectorAll('.nav-item').forEach(function(x){x.classList.remove('active');});
+  var pg=E('page-'+p);if(pg)pg.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(x){
+    var oc=x.getAttribute('onclick')||'';
+    if(oc.indexOf("'"+p+"'")>=0)x.classList.add('active');
+  });
+  if(E('page-title'))E('page-title').textContent=TITLES[p]||p;
+  closeSB();
+  if(p==='dashboard')rDash();
+  else if(p==='membres')rMembres();
+  else if(p==='cotisations'){pSels();rCots();}
+  else if(p==='adhesion'){pSels();rAdh();}
+  else if(p==='retards'){pSels();rRets();}
+  else if(p==='amendes'){pSels();rAms();}
+  else if(p==='dons'){pSels2();rDons();}
+  else if(p==='prets'){pSels2();rPrets();}
+  else if(p==='pret-interet'){pSels2();rPI();}
+  else if(p==='fond-caisse')rFC();
+  else if(p==='fond-cotisation'){pSels2();rFK();}
+  else if(p==='reunions'){pReun();rReuns();}
+  else if(p==='comptabilite')initCompta();
+  else if(p==='alertes')rAlertes();
+  else if(p==='mon-compte'){pMC();rMC();}
+  else if(p==='configuration')loadConf();
+  else if(p==='superadmin'){if(IS_SUPER)rSuperAdmin();else navTo('dashboard');}
+}
+function pSels(){
+  var opts=MC.map(function(m){return '<option value="'+m.id+'">'+m.prenom+' '+m.nom+'</option>';}).join('');
+  ['cot-m','adh-m','ret-m','am-membre'].forEach(function(id){var e=E(id);if(e)e.innerHTML=opts;});
+  var e=E('cot-fm');if(e)e.innerHTML='<option value="">Tous les membres</option>'+opts;
+}
+function pSels2(){
+  var opts=MC.map(function(m){return '<option value="'+m.id+'">'+m.prenom+' '+m.nom+' (solde: '+fmt(FC[m.id]||0)+' EUR)</option>';}).join('');
+  ['don-benef','pret-benef','pi-benef'].forEach(function(id){var e=E(id);if(e)e.innerHTML=opts;});
+  var optsVir=MC.map(function(m){return '<option value="'+m.id+'">'+m.prenom+' '+m.nom+'</option>';}).join('');
+  var ev=E('vir-membre');if(ev)ev.innerHTML=optsVir;
+}
+function pMC(){
+  var opts='<option value="">-- Choisir un membre --</option>'+MC.map(function(m){return '<option value="'+m.id+'">'+m.prenom+' '+m.nom+'</option>';}).join('');
+  var e=E('mc-select');if(e)e.innerHTML=opts;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded',function(){
+  E('topbar-date').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'long',year:'numeric'});
+  ['cot-dt','ret-dt','am-dt','adh-dt','don-dt','pret-dt','pi-date','caisse-dt','vir-dt','reun-dt'].forEach(function(id){var e=E(id);if(e)e.value=td();});
+  var ae=E('adh-an');if(ae)ae.value=new Date().getFullYear();
+  var ce=E('cot-mo');if(ce)ce.value=td().slice(0,7);
+  var col=E('cf-col');
+  if(col)col.addEventListener('input',function(ev){var h=E('cf-col-hex');if(h)h.value=ev.target.value;document.documentElement.style.setProperty('--accent',ev.target.value);});
+  initApp();
+});
+
+function initApp(){
+  if(!SB_URL||!SB_KEY){showSS('setup');return;}
+  try{
+    sb=window.supabase.createClient(SB_URL,SB_KEY);
+    sb.auth.getSession().then(function(res){
+      if(res.data&&res.data.session){CU=res.data.session.user;chargeD().then(function(){showSS('app');rDash();});}
+      else{showSS('landing');}
+    }).catch(function(){showSS('auth');});
+    sb.auth.onAuthStateChange(function(event,session){
+      if(event==='SIGNED_IN'&&session&&!CU){CU=session.user;chargeD().then(function(){showSS('app');rDash();});}
+      else if(event==='SIGNED_OUT'){CU=null;CA=null;MC=[];FC={};CUD=null;IS_SUPER=false;var sn=E('nav-superadmin');if(sn)sn.style.display='none';showSS('auth');}
+    });
+  }catch(e){showSS('setup');}
+}
+
+function chargeD(){
+  return sb.from('utilisateurs').select('*,associations(*)').eq('auth_user_id',CU.id).single().then(function(res){
+    if(res.data){
+      CUD=res.data;
+      IS_SUPER=(res.data.role==='superadmin');
+      if(res.data.associations){CA=res.data.associations;updSB(res.data);return refreshCache();}
+      else if(IS_SUPER){updSBSuper(res.data);return Promise.resolve();}
+      else{sH('page-dashboard','<div class="alert alert-error">Compte non lié à une association. Vérifiez la table utilisateurs.</div><div class="alert alert-info" style="margin-top:8px">Votre auth_user_id : <code style="font-size:11px">'+CU.id+'</code></div>');}
+    } else{sH('page-dashboard','<div class="alert alert-error">Compte introuvable dans la table utilisateurs.</div>');}
+  });
+}
+function refreshCache(){
+  if(!CA)return Promise.resolve();
+  return sb.from('membres').select('*').eq('association_id',CA.id).order('nom').then(function(r){
+    MC=r.data||[];
+    return sb.from('fonds_adhesion').select('membre_id,solde').eq('association_id',CA.id);
+  }).then(function(r){
+    FC={};(r.data||[]).forEach(function(f){FC[f.membre_id]=+f.solde;});
+    sH('sb-count',''+MC.filter(function(m){return m.statut==='actif';}).length);
+  });
+}
+function updSB(ud){
+  var nom=((ud.prenom||'')+' '+(ud.nom||'')).trim()||CU.email;
+  if(E('sb-nom'))E('sb-nom').textContent=(CA&&CA.nom)||'Mboa';
+  if(E('sb-plan'))E('sb-plan').textContent='Plan '+((CA&&CA.plan)||'gratuit');
+  if(E('sb-user'))E('sb-user').textContent=nom;
+  if(E('sb-role'))E('sb-role').textContent=IS_SUPER?'⚡ Super Admin':(ud.role||'Admin');
+  if(E('sb-av'))E('sb-av').textContent=nom.slice(0,2).toUpperCase();
+  if(IS_SUPER){var sn=E('nav-superadmin');if(sn)sn.style.display='flex';if(E('sb-plan')){E('sb-plan').textContent='⚡ Super Admin';E('sb-plan').style.color='var(--accent)';}}
+  applyConf();
+}
+function updSBSuper(ud){
+  var nom=((ud.prenom||'')+' '+(ud.nom||'')).trim()||CU.email;
+  if(E('sb-nom'))E('sb-nom').textContent='Mboa';
+  if(E('sb-plan')){E('sb-plan').textContent='⚡ Super Admin';E('sb-plan').style.color='var(--accent)';}
+  if(E('sb-user'))E('sb-user').textContent=nom;
+  if(E('sb-role'))E('sb-role').textContent='⚡ Super Admin';
+  if(E('sb-av'))E('sb-av').textContent=nom.slice(0,2).toUpperCase();
+  var sn=E('nav-superadmin');if(sn)sn.style.display='flex';
+}
+function applyConf(){
+  if(!CA)return;
+  if(CA.couleur_accent)document.documentElement.style.setProperty('--accent',CA.couleur_accent);
+  var m={'cf-nom':'nom','cf-heure':'heure_reunion','cf-t1':'tranche1_max','cf-t2':'tranche2_max'};
+  Object.keys(m).forEach(function(k){var e=E(k);if(e&&CA[m[k]])e.value=CA[m[k]];});
+  function sv(id,v){var e=E(id);if(e&&v!=null)e.value=v;}
+  sv('cf-col',CA.couleur_accent||'#f5c842');sv('cf-col-hex',CA.couleur_accent||'#f5c842');
+  sv('cf-m1',CA.tranche1_montant||2.5);sv('cf-m2',CA.tranche2_montant||5);
+  sv('cf-am',CA.montant_amende_absence||15);sv('cf-nba',CA.nb_absences_avant_amende||3);
+  sv('cf-mr',CA.mois_reset||10);sv('cf-dr',CA.duree_remboursement_mois||3);
+}
+
+// ============================================================
+// SETUP & AUTH
+// ============================================================
+function doSetup(){
+  var url=gV('s-url'),key=gV('s-key');
+  if(!url||!key){alert('URL et clé requis.');return;}
+  SB_URL=url;SB_KEY=key;
+  initApp();
+}
+function resetSU(){location.reload();}
+function aTab(i){
+  document.querySelectorAll('.auth-tab').forEach(function(t,j){t.classList.toggle('active',i===j);});
+  E('f-login').classList.toggle('hidden',i!==0);
+  E('f-register').classList.toggle('hidden',i!==1);
+  var am=E('auth-msg');if(am)am.classList.add('hidden');
+}
+function showAM(msg,type){var e=E('auth-msg');if(!e)return;e.className='al al-'+(type||'e');e.textContent=msg;e.classList.remove('hidden');}
+function doLogin(){
+  var email=gV('li-email'),pwd=E('li-pwd').value;
+  if(!email||!pwd){showAM('Remplissez email et mot de passe.');return;}
+  sb.auth.signInWithPassword({email:email,password:pwd}).then(function(r){
+    if(r.error)showAM(r.error.message);
+  });
+}
+function doRegister(){
+  var asso=gV('rg-asso'),prenom=gV('rg-prenom'),nom=gV('rg-nom'),email=gV('rg-email'),pwd=E('rg-pwd').value;
+  if(!asso||!prenom||!nom||!email||!pwd){showAM('Tous les champs sont requis.');return;}
+  sb.auth.signUp({email:email,password:pwd}).then(function(r){
+    if(r.error){showAM(r.error.message);return;}
+    sb.from('associations').insert({nom:asso,plan:'gratuit'}).select().single().then(function(ra){
+      if(ra.error){showAM('Erreur création association: '+ra.error.message);return;}
+      sb.from('utilisateurs').insert({association_id:ra.data.id,auth_user_id:r.data.user.id,email:email,prenom:prenom,nom:nom,role:'admin'}).then(function(){
+        showAM('Compte créé ! Vérifiez votre email.','s');
+      });
+    });
+  });
+}
+function dofPwd(){var e=prompt('Votre email :');if(e){sb.auth.resetPasswordForEmail(e).then(function(){alert('Email envoyé !');});}}
+function doLogout(){sb.auth.signOut();}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function rDash(){
+  if(!CA)return;
+  refreshCache().then(function(){
+    var aid=CA.id;
+    var actifs=MC.filter(function(m){return m.statut==='actif';}).length;
+    var totalFonds=Object.values(FC).reduce(function(a,b){return a+b;},0);
+    var plan=(CA.plan)||'gratuit';
+    Promise.all([
+      sb.from('cotisations').select('montant,statut').eq('association_id',aid),
+      sb.from('retards').select('montant,statut').eq('association_id',aid),
+      sb.from('amendes').select('montant,statut').eq('association_id',aid),
+      sb.from('sorties_caisse').select('montant').eq('association_id',aid),
+      sb.from('virements_cotisation').select('montant').eq('association_id',aid),
+      sb.from('entrees_caisse').select('montant').eq('association_id',aid)
+    ]).then(function(rs){
+      var cots=rs[0].data||[],rets=rs[1].data||[],ams=rs[2].data||[];
+      var sorties=rs[3].data||[],virCot=rs[4].data||[],entreesCaisse=rs[5].data||[];
+      var totC=cots.filter(function(c){return c.statut==='paye';}).reduce(function(s,c){return s+(+c.montant);},0);
+      var impC=cots.filter(function(c){return c.statut==='impaye';}).length;
+      var totR=rets.filter(function(x){return x.statut==='impaye';}).reduce(function(s,r){return s+(+r.montant);},0);
+      var totA=ams.filter(function(x){return x.statut==='impaye';}).reduce(function(s,a){return s+(+a.montant);},0);
+      // Fond caisse = retards payés + amendes payées + remb.prêts caisse - sorties manuelles
+      var totRetPaye=rets.filter(function(x){return x.statut==='paye';}).reduce(function(s,x){return s+(+x.montant);},0);
+      var totAmPaye=ams.filter(function(x){return x.statut==='paye';}).reduce(function(s,x){return s+(+x.montant);},0);
+      var totEC=entreesCaisse.reduce(function(s,x){return s+(+x.montant);},0);
+      var soldeCaisse=(totRetPaye+totAmPaye+totEC)-sorties.reduce(function(s,x){return s+(+x.montant);},0);
+      // Fond cotisation = cotisations payées - virements membres
+      var soldeCot=totC-virCot.reduce(function(s,x){return s+(+x.montant);},0);
+      sH('dash-stats',
+        '<div class="stat-card yellow"><div class="stat-label">Membres actifs</div><div class="stat-val">'+actifs+'</div><div class="stat-sub">'+MC.length+' au total</div></div>'+
+        '<div class="stat-card green"><div class="stat-label">Cotisations perçues</div><div class="stat-val">'+fmt(totC)+' EUR</div><div class="stat-sub">'+impC+' impayé(s)</div></div>'+
+        '<div class="stat-card blue"><div class="stat-label">Fond adhésion total</div><div class="stat-val">'+fmt(totalFonds)+' EUR</div></div>'+
+        '<div class="stat-card green"><div class="stat-label">Solde fond caisse</div><div class="stat-val">'+fmt(soldeCaisse)+' EUR</div></div>'+
+        '<div class="stat-card blue"><div class="stat-label">Solde fond cotisation</div><div class="stat-val">'+fmt(soldeCot)+' EUR</div></div>'+
+        '<div class="stat-card red"><div class="stat-label">Retards impayés</div><div class="stat-val">'+fmt(totR)+' EUR</div></div>'+
+        '<div class="stat-card red"><div class="stat-label">Amendes impayées</div><div class="stat-val">'+fmt(totA)+' EUR</div></div>'+
+        '<div class="stat-card"><div class="stat-label">Plan</div><div class="stat-val" style="font-size:18px">'+plan.charAt(0).toUpperCase()+plan.slice(1)+'</div></div>'
+      );
+      var fh=MC.filter(function(m){return m.statut==='actif';}).map(function(m){
+        return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'+avEl(m.id)+'<div style="flex:1"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>'+m.prenom+' '+m.nom+'</span><span style="font-weight:500">'+fmt(FC[m.id]||0)+' EUR</span></div><div class="progress"><div class="progress-bar" style="width:'+Math.min(100,FC[m.id]||0)+'%"></div></div></div></div>';
+      }).join('');
+      sH('dash-fonds',fh||'<div class="empty">Aucun membre actif</div>');
+      sH('dash-resume',
+        '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--text2)">Retards impayés</span><span style="font-weight:500;color:var(--red)">'+fmt(totR)+' EUR</span></div>'+
+        '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--text2)">Amendes impayées</span><span style="font-weight:500;color:var(--red)">'+fmt(totA)+' EUR</span></div>'+
+        '<div style="display:flex;justify-content:space-between;padding:10px 0;font-size:13px"><span style="color:var(--text2)">Fond adhésion</span><span style="font-weight:500;color:var(--blue)">'+fmt(totalFonds)+' EUR</span></div>'
+      );
+    }).catch(function(e){console.error('rDash error',e);});
+  });
+}
+
+// ============================================================
+// MEMBRES
+// ============================================================
+function rMembres(){
+  if(!CA)return;
+  refreshCache().then(function(){
+    pSels();
+    var h=MC.length?MC.map(function(m){
+      return '<tr><td>'+mChip(m.id)+'</td><td>'+(m.tel||'--')+'</td><td>'+(m.email||'--')+'</td>'+
+        '<td><span class="badge '+(m.statut==='actif'?'badge-green':'badge-gray')+'">'+(m.statut==='actif'?'Actif':'Inactif')+'</span></td>'+
+        '<td style="font-weight:500">'+fmt(FC[m.id]||0)+' EUR</td>'+
+        '<td style="display:flex;gap:5px"><button class="btn-s btn-sm" onclick="editM(\''+m.id+'\')">Modifier</button> <button class="btn-d btn-sm" onclick="delM(\''+m.id+'\')">Suppr.</button></td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucun membre</div></td></tr>';
+    sH('m-tbody',h);
+  });
+}
+function openMM(){
+  E('mm-titre').textContent='Nouveau membre';E('mm-id').value='';
+  ['mm-prenom','mm-nom','mm-tel','mm-email','mm-note'].forEach(function(id){E(id).value='';});
+  E('mm-date').value=td();E('mm-statut').value='actif';
+  openMO('modal-m');
+}
+function editM(id){
+  var m=MC.find(function(x){return x.id===id;});if(!m)return;
+  E('mm-titre').textContent='Modifier';E('mm-id').value=id;
+  E('mm-prenom').value=m.prenom||'';E('mm-nom').value=m.nom||'';
+  E('mm-tel').value=m.tel||'';E('mm-email').value=m.email||'';
+  E('mm-date').value=m.date_adhesion||'';E('mm-statut').value=m.statut||'actif';
+  E('mm-note').value=m.note||'';
+  openMO('modal-m');
+}
+function saveMembre(){
+  var prenom=gV('mm-prenom'),nom=gV('mm-nom');
+  if(!prenom||!nom){alert('Prénom et nom requis.');return;}
+  var id=E('mm-id').value;
+  var data={prenom:prenom,nom:nom,tel:gV('mm-tel')||null,email:gV('mm-email')||null,date_adhesion:E('mm-date').value||null,statut:E('mm-statut').value,note:gV('mm-note')||null};
+  var p;
+  if(id){p=sb.from('membres').update(data).eq('id',id);}
+  else{
+    if(((CA&&CA.plan)||'gratuit')==='gratuit'&&MC.length>=10){alert('Limite 10 membres (plan gratuit).');return;}
+    p=sb.from('membres').insert(Object.assign({},data,{association_id:CA.id})).select().single().then(function(r){
+      if(r.data)return sb.from('fonds_adhesion').insert({association_id:CA.id,membre_id:r.data.id,solde:0});
+    });
+  }
+  p.then(function(){closeMO('modal-m');refreshCache().then(rMembres);});
+}
+function delM(id){if(!confirm('Supprimer ce membre ?'))return;sb.from('membres').delete().eq('id',id).then(function(){refreshCache().then(rMembres);});}
+
+// ============================================================
+// COTISATIONS
+// ============================================================
+function rCots(){
+  if(!CA)return;
+  var fm=(E('cot-fm')||{}).value||'',fs=(E('cot-fs')||{}).value||'';
+  var q=sb.from('cotisations').select('*').eq('association_id',CA.id).order('mois',{ascending:false});
+  if(fm)q=q.eq('membre_id',fm);if(fs)q=q.eq('statut',fs);
+  q.then(function(r){
+    var data=r.data||[];
+    var tot=data.filter(function(c){return c.statut==='paye';}).reduce(function(s,c){return s+(+c.montant);},0);
+    var te=E('cot-total');if(te)te.textContent='Total perçu: '+fmt(tot)+' EUR';
+    var h=data.length?data.map(function(c){
+      return '<tr><td>'+mChip(c.membre_id)+'</td><td>'+(c.mois||'--')+'</td><td>'+fmt(c.montant)+' EUR</td>'+
+        '<td>'+fdD(c.date_paiement)+'</td>'+
+        '<td><span class="badge '+(c.statut==='paye'?'badge-green':'badge-red')+'">'+(c.statut==='paye'?'Payé':'Impayé')+'</span></td>'+
+        '<td><button class="btn-d btn-sm" onclick="delCot(\''+c.id+'\')">Suppr.</button></td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucune cotisation</div></td></tr>';
+    sH('cot-tbody',h);
+  });
+}
+function addCot(){
+  var d={association_id:CA.id,membre_id:gV('cot-m'),mois:E('cot-mo').value,montant:+E('cot-mt').value,date_paiement:E('cot-dt').value||null,statut:E('cot-st').value,note:gV('cot-note')||null};
+  if(!d.membre_id||!d.mois||!d.montant){alert('Membre, mois et montant requis.');return;}
+  sb.from('cotisations').insert(d).then(function(){rCots();E('page-cotisations').querySelectorAll('.tab')[0].click();});
+}
+function delCot(id){if(!confirm('Supprimer ?'))return;sb.from('cotisations').delete().eq('id',id).then(rCots);}
+
+// ============================================================
+// ADHESION
+// ============================================================
+function rAdh(){
+  if(!CA)return;
+  // Fonds tab
+  var fh=MC.map(function(m){return '<tr><td>'+mChip(m.id)+'</td><td style="font-weight:500">'+fmt(FC[m.id]||0)+' EUR</td></tr>';}).join('');
+  sH('adh-fonds-tbody',fh||'<tr><td colspan="2"><div class="empty">Aucun membre</div></td></tr>');
+  // Paiements tab
+  sb.from('adhesions').select('*').eq('association_id',CA.id).order('annee',{ascending:false}).then(function(r){
+    var data=r.data||[];
+    var h=data.length?data.map(function(a){
+      return '<tr><td>'+mChip(a.membre_id)+'</td><td>'+(a.annee||'--')+'</td><td>'+fmt(a.montant)+' EUR</td><td>'+fdD(a.date_paiement)+'</td><td>'+(a.note||'--')+'</td>'+
+        '<td><button class="btn-d btn-sm" onclick="delI(\'adhesions\',\''+a.id+'\',rAdh)">Suppr.</button></td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucun paiement</div></td></tr>';
+    sH('adh-tbody',h);
+  });
+}
+function addAdh(){
+  var mid=gV('adh-m'),an=E('adh-an').value,mt=+E('adh-mt').value;
+  if(!mid||!an||!mt){alert('Membre, année et montant requis.');return;}
+  sb.from('adhesions').insert({association_id:CA.id,membre_id:mid,annee:+an,montant:mt,date_paiement:E('adh-dt').value||null,note:gV('adh-note')||null}).then(function(r){
+    if(r.error){alert('Erreur: '+r.error.message);return;}
+    // Update fond adhesion
+    var newSolde=(FC[mid]||0)+mt;
+    sb.from('fonds_adhesion').update({solde:newSolde}).eq('association_id',CA.id).eq('membre_id',mid).then(function(){
+      refreshCache().then(rAdh);E('page-adhesion').querySelectorAll('.tab')[0].click();
+    });
+  });
+}
+
+// ============================================================
+// RETARDS
+// ============================================================
+function rRets(){
+  if(!CA)return;
+  sb.from('retards').select('*').eq('association_id',CA.id).order('date_infraction',{ascending:false}).then(function(r){
+    var data=r.data||[];
+    var h=data.length?data.map(function(x){
+      return '<tr><td>'+mChip(x.membre_id)+'</td><td>'+(x.motif||'--')+'</td><td>'+fmt(x.montant)+' EUR</td><td>'+fdD(x.date_infraction)+'</td>'+
+        '<td><span class="badge '+(x.statut==='paye'?'badge-green':'badge-red')+'">'+(x.statut==='paye'?'Payé':'Impayé')+'</span></td>'+
+        '<td style="display:flex;gap:5px">'+(x.statut==='impaye'?'<button class="btn-s btn-sm" onclick="payI(\'retards\',\''+x.id+'\')">Payer</button>':'')+
+        '<button class="btn-d btn-sm" onclick="delI(\'retards\',\''+x.id+'\',rRets)">Suppr.</button></td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucun retard</div></td></tr>';
+    sH('ret-tbody',h);
+  });
+}
+function addRet(){
+  var d={association_id:CA.id,membre_id:gV('ret-m'),motif:gV('ret-motif'),montant:+E('ret-mt').value,date_infraction:E('ret-dt').value||null,statut:E('ret-st').value};
+  if(!d.membre_id||!d.montant){alert('Membre et montant requis.');return;}
+  sb.from('retards').insert(d).then(function(){rRets();E('page-retards').querySelectorAll('.tab')[0].click();});
+}
+
+// ============================================================
+// AMENDES
+// ============================================================
+function rAms(){
+  if(!CA)return;
+  sb.from('amendes').select('*').eq('association_id',CA.id).order('date_infraction',{ascending:false}).then(function(r){
+    var data=r.data||[];
+    var h=data.length?data.map(function(x){
+      return '<tr><td>'+mChip(x.membre_id)+'</td><td>'+(x.motif||'--')+'</td><td>'+fmt(x.montant)+' EUR</td><td>'+fdD(x.date_infraction)+'</td>'+
+        '<td><span class="badge '+(x.statut==='paye'?'badge-green':'badge-red')+'">'+(x.statut==='paye'?'Payé':'Impayé')+'</span></td>'+
+        '<td style="display:flex;gap:5px">'+(x.statut==='impaye'?'<button class="btn-s btn-sm" onclick="payI(\'amendes\',\''+x.id+'\')">Payer</button>':'')+
+        '<button class="btn-d btn-sm" onclick="delI(\'amendes\',\''+x.id+'\',rAms)">Suppr.</button></td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucune amende</div></td></tr>';
+    sH('am-tbody',h);
+  });
+}
+function addAm(){
+  var d={association_id:CA.id,membre_id:gV('am-membre'),motif:gV('am-motif'),montant:+E('am-mt').value,date_infraction:E('am-dt').value||null,statut:E('am-st').value};
+  if(!d.membre_id||!d.montant){alert('Membre et montant requis.');return;}
+  sb.from('amendes').insert(d).then(function(){rAms();E('page-amendes').querySelectorAll('.tab')[0].click();});
+}
+
+// ============================================================
+// PAIEMENT GENERIQUE
+// ============================================================
+function payI(table,id){E('pay-tb').value=table;E('pay-id').value=id;E('pay-dt').value=td();openMO('modal-pay');}
+function confirmPay(){
+  var tb=E('pay-tb').value,id=E('pay-id').value,dt=E('pay-dt').value;
+  sb.from(tb).update({statut:'paye',date_paiement:dt}).eq('id',id).then(function(){
+    closeMO('modal-pay');
+    if(tb==='retards')rRets();else rAms();
+  });
+}
+function delI(table,id,fn){if(!confirm('Supprimer ?'))return;sb.from(table).delete().eq('id',id).then(fn);}
+
+// ============================================================
+// DONS
+// ============================================================
+function rDons(){
+  if(!CA)return;
+  Promise.all([
+    sb.from('dons').select('*').eq('association_id',CA.id).order('date_don',{ascending:false}),
+    sb.from('remboursements').select('*').eq('association_id',CA.id).eq('type','don').order('echeance',{ascending:true})
+  ]).then(function(rs){
+    var dons=rs[0].data||[],rembs=rs[1].data||[];
+    var dh=dons.length?dons.map(function(d){
+      return '<tr><td>'+mChip(d.beneficiaire_id)+'</td><td>'+fmt(d.montant)+' EUR</td><td>'+fdD(d.date_don)+'</td><td>'+(d.motif||'--')+'</td>'+
+        '<td><button class="btn-d btn-sm" onclick="delDon(\''+d.id+'\')">Suppr.</button></td></tr>';
+    }).join(''):'<tr><td colspan="5"><div class="empty">Aucun don</div></td></tr>';
+    sH('don-tbody',dh);
+    var rh=rembs.length?rembs.map(function(r){
+      var ov=r.echeance<td();
+      return '<tr><td>'+mChip(r.membre_id)+'</td><td>'+fmt(r.reference_montant||0)+' EUR (don)</td><td>'+fmt(r.montant)+' EUR</td><td>'+fdD(r.echeance)+'</td>'+
+        '<td><span class="badge '+(r.statut==='paye'?'badge-green':ov?'badge-red':'badge-yellow')+'">'+(r.statut==='paye'?'Payé':ov?'En retard':'En attente')+'</span></td>'+
+        '<td>'+(r.statut==='en attente'?'<button class="btn-s btn-sm" onclick="payRemb(\''+r.id+'\')">Marquer payé</button>':'--')+'</td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucun remboursement</div></td></tr>';
+    sH('donr-tbody',rh);
+  });
+}
+function addDon(){
+  var benefId=gV('don-benef'),mt=+E('don-mt').value,dt=E('don-dt').value;
+  if(!benefId||!mt){alert('Bénéficiaire et montant requis.');return;}
+  var autres=MC.filter(function(m){return m.id!==benefId&&m.statut==='actif';});
+  if(!autres.length){alert('Pas assez de membres actifs.');return;}
+  var partChacun=mt/autres.length;
+  // Débiter le fond adhésion de chaque autre membre
+  var updates=autres.map(function(m){
+    return sb.from('fonds_adhesion').update({solde:(FC[m.id]||0)-partChacun}).eq('association_id',CA.id).eq('membre_id',m.id);
+  });
+  Promise.all(updates).then(function(){
+    sb.from('dons').insert({association_id:CA.id,beneficiaire_id:benefId,montant:mt,date_don:dt,motif:gV('don-motif')||null}).select().single().then(function(r){
+      if(r.error){alert('Erreur: '+r.error.message);return;}
+      var donId=r.data.id;
+      var rembs=autres.map(function(m){
+        return{association_id:CA.id,membre_id:m.id,type:'don',reference_id:donId,reference_montant:mt,montant:partChacun,echeance:addM(dt,dRemb()),statut:'en attente'};
+      });
+      sb.from('remboursements').insert(rembs).then(function(){
+        refreshCache().then(function(){rDons();E('page-dons').querySelectorAll('.tab')[0].click();});
+      });
+    });
+  });
+}
+function delDon(id){if(!confirm('Supprimer ce don et ses remboursements ?'))return;sb.from('remboursements').delete().eq('reference_id',id).then(function(){sb.from('dons').delete().eq('id',id).then(rDons);});}
+function payRemb(id){
+  sb.from('remboursements').select('*').eq('id',id).single().then(function(r){
+    if(!r.data)return;
+    var remb=r.data;
+    sb.from('remboursements').update({statut:'paye',date_paiement:td()}).eq('id',id).then(function(){
+      // Recréditer le fond adhésion du membre qui rembourse
+      var soldeMembre=FC[remb.membre_id]||0;
+      sb.from('fonds_adhesion').update({solde:soldeMembre+remb.montant}).eq('association_id',CA.id).eq('membre_id',remb.membre_id).then(function(){
+        refreshCache().then(function(){
+          if(remb.type==='pret')rPrets();else rDons();
+        });
+      });
+    });
+  });
+}
+
+// ============================================================
+// PRETS SIMPLES
+// ============================================================
+function rPrets(){
+  if(!CA)return;
+  Promise.all([
+    sb.from('prets').select('*').eq('association_id',CA.id).order('date_pret',{ascending:false}),
+    sb.from('remboursements').select('*').eq('association_id',CA.id).eq('type','pret').order('echeance',{ascending:true})
+  ]).then(function(rs){
+    var prets=rs[0].data||[],rembs=rs[1].data||[];
+    var ph=prets.length?prets.map(function(p){
+      return '<tr><td>'+mChip(p.beneficiaire_id)+'</td><td>'+fmt(p.montant)+' EUR</td><td>'+fdD(p.date_pret)+'</td><td>'+(p.motif||'--')+'</td>'+
+        '<td><span class="badge '+(p.statut==='rembourse'?'badge-green':'badge-yellow')+'">'+(p.statut||'en cours')+'</span></td>'+
+        '<td><button class="btn-d btn-sm" onclick="delPret(\''+p.id+'\')">Suppr.</button></td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucun prêt</div></td></tr>';
+    sH('pret-tbody',ph);
+    var rh=rembs.length?rembs.map(function(r){
+      var ov=r.echeance<td();
+      return '<tr><td>'+mChip(r.membre_id)+'</td><td>'+fmt(r.reference_montant||0)+' EUR (prêt)</td><td>'+fmt(r.montant)+' EUR</td><td>'+fdD(r.echeance)+'</td>'+
+        '<td><span class="badge '+(r.statut==='paye'?'badge-green':ov?'badge-red':'badge-yellow')+'">'+(r.statut==='paye'?'Payé':ov?'En retard':'En attente')+'</span></td>'+
+        '<td>'+(r.statut==='en attente'?'<button class="btn-s btn-sm" onclick="payRemb(\''+r.id+'\')">Payé</button>':'--')+'</td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucun remboursement</div></td></tr>';
+    sH('pretr-tbody',rh);
+  });
+}
+function addPret(){
+  var benefId=gV('pret-benef'),mt=+E('pret-mt').value,dt=E('pret-dt').value;
+  if(!benefId||!mt){alert('Bénéficiaire et montant requis.');return;}
+  var tousActifs=MC.filter(function(m){return m.statut==='actif';});
+  var partChacun=tousActifs.length?mt/tousActifs.length:mt;
+  // Débiter le fond adhésion de TOUS les membres actifs
+  var updates=tousActifs.map(function(m){
+    return sb.from('fonds_adhesion').update({solde:(FC[m.id]||0)-partChacun}).eq('association_id',CA.id).eq('membre_id',m.id);
+  });
+  Promise.all(updates).then(function(){
+    sb.from('prets').insert({association_id:CA.id,beneficiaire_id:benefId,montant:mt,date_pret:dt,motif:gV('pret-motif')||null,statut:'en cours'}).select().single().then(function(r){
+      if(r.error){alert('Erreur: '+r.error.message);return;}
+      var pretId=r.data.id;
+      var rembs=tousActifs.map(function(m){
+        return{association_id:CA.id,membre_id:m.id,type:'pret',reference_id:pretId,reference_montant:mt,montant:partChacun,echeance:addM(dt,dRemb()),statut:'en attente'};
+      });
+      sb.from('remboursements').insert(rembs).then(function(){refreshCache().then(function(){rPrets();E('page-prets').querySelectorAll('.tab')[0].click();});});
+    });
+  });
+}
+function delPret(id){if(!confirm('Supprimer ?'))return;sb.from('remboursements').delete().eq('reference_id',id).then(function(){sb.from('prets').delete().eq('id',id).then(rPrets);});}
+
+// ============================================================
+// PRETS AVEC INTERETS
+// ============================================================
+function calcInt(cap,type,taux,dur){
+  if(type==='fixe'){var i=cap*(taux/100);return{interets:i,total:cap+i};}
+  var t=taux/100,tot=cap*Math.pow(1+t,dur);return{interets:tot-cap,total:tot};
+}
+function prvPI(){
+  var cap=+E('pi-capital').value,type=E('pi-type').value,taux=+E('pi-taux').value,dur=+E('pi-duree').value;
+  if(!cap||!taux||!dur){sH('pi-preview','');return;}
+  var r=calcInt(cap,type,taux,dur);
+  sH('pi-preview','<div class="alert alert-info">Capital: '+fmt(cap)+' EUR | Intérêts: '+fmt(r.interets)+' EUR | <strong>Total dû: '+fmt(r.total)+' EUR</strong></div>');
+}
+function rPI(){
+  if(!CA)return;
+  sb.from('prets_interets').select('*').eq('association_id',CA.id).order('date_octroi',{ascending:false}).then(function(r){
+    var data=r.data||[];
+    var h=data.length?data.map(function(p){
+      var ov=p.date_echeance&&p.date_echeance<td()&&p.statut!=='rembourse';
+      return '<tr><td>'+mChip(p.beneficiaire_id)+'</td><td>'+fmt(p.capital)+' EUR</td><td>'+fmt(p.interets)+' EUR</td><td>'+fmt(p.total_du)+' EUR</td>'+
+        '<td>'+p.taux+'% ('+p.type_taux+')</td><td>'+(p.duree_mois||'--')+' mois</td><td>'+fdD(p.date_octroi)+'</td><td>'+fdD(p.date_echeance)+'</td>'+
+        '<td><span class="badge '+(p.statut==='rembourse'?'badge-green':ov?'badge-red':'badge-yellow')+'">'+(p.statut==='rembourse'?'Remboursé':ov?'En retard':'En cours')+'</span></td>'+
+        '<td style="display:flex;gap:4px">'+(p.statut==='en cours'?'<button class="btn-s btn-sm" onclick="mrkPI(\''+p.id+'\')">Remboursé</button>':'')+
+        '<button class="btn-d btn-sm" onclick="delPI(\''+p.id+'\')">Suppr.</button></td></tr>';
+    }).join(''):'<tr><td colspan="10"><div class="empty">Aucun prêt avec intérêts</div></td></tr>';
+    sH('pi-tbody',h);
+  }).catch(function(){sH('pi-tbody','<tr><td colspan="10"><div class="alert alert-error">Table prets_interets introuvable. Créez-la dans Supabase SQL Editor.</div></td></tr>');});
+}
+function addPI(){
+  var benefId=gV('pi-benef'),cap=+E('pi-capital').value,type=E('pi-type').value,taux=+E('pi-taux').value,dur=+E('pi-duree').value,date=E('pi-date').value,fond=E('pi-fond').value;
+  if(!benefId||!cap||!taux||!dur){alert('Bénéficiaire, capital, taux et durée requis.');return;}
+  var r=calcInt(cap,type,taux,dur);
+  var ech=addM(date,dur);
+  var insertPret=function(){
+    sb.from('prets_interets').insert({association_id:CA.id,beneficiaire_id:benefId,capital:cap,interets:r.interets,total_du:r.total,type_taux:type,taux:taux,duree_mois:dur,date_octroi:date,date_echeance:ech,fond:fond,motif:gV('pi-motif')||null,statut:'en cours'}).then(function(res){
+      if(res.error){alert('Erreur: '+res.error.message);return;}
+      E('pi-capital').value='';E('pi-taux').value='';sH('pi-preview','');
+      refreshCache().then(function(){rPI();E('page-pret-interet').querySelectorAll('.tab')[0].click();});
+    });
+  };
+  if(fond==='caisse'){
+    // Débiter le fond caisse via sortie manuelle
+    sb.from('sorties_caisse').insert({association_id:CA.id,montant:cap,date_sortie:date,motif:'Prêt+intérêts accordé à '+mNm(benefId)}).then(insertPret);
+  } else {
+    // Fond adhésion : débiter tous les membres actifs
+    var tousActifs=MC.filter(function(m){return m.statut==='actif';});
+    var partChacun=tousActifs.length?cap/tousActifs.length:cap;
+    var updates=tousActifs.map(function(m){
+      return sb.from('fonds_adhesion').update({solde:(FC[m.id]||0)-partChacun}).eq('association_id',CA.id).eq('membre_id',m.id);
+    });
+    Promise.all(updates).then(insertPret);
+  }
+}
+function mrkPI(id){
+  if(!confirm('Marquer comme remboursé ?'))return;
+  sb.from('prets_interets').select('*').eq('id',id).single().then(function(r){
+    if(!r.data)return;
+    var p=r.data;
+    sb.from('prets_interets').update({statut:'rembourse'}).eq('id',id).then(function(){
+      if(p.fond==='caisse'){
+        // Remboursement vers fond caisse : enregistrer comme entrée caisse
+        sb.from('entrees_caisse').insert({association_id:CA.id,montant:p.total_du,date_entree:td(),motif:'Remboursement prêt+intérêts de '+mNm(p.beneficiaire_id)}).then(function(){rPI();}).catch(function(){rPI();});
+      } else {
+        // Fond adhésion : recréditer tous les membres actifs proportionnellement
+        var tousActifs=MC.filter(function(m){return m.statut==='actif';});
+        var partChacun=tousActifs.length?p.capital/tousActifs.length:p.capital;
+        var updates=tousActifs.map(function(m){
+          return sb.from('fonds_adhesion').update({solde:(FC[m.id]||0)+partChacun}).eq('association_id',CA.id).eq('membre_id',m.id);
+        });
+        Promise.all(updates).then(function(){refreshCache().then(rPI);});
+      }
+    });
+  });
+}
+function delPI(id){if(!confirm('Supprimer ?'))return;sb.from('prets_interets').delete().eq('id',id).then(rPI);}
+
+// ============================================================
+// FOND CAISSE
+// ============================================================
+function rFC(){
+  if(!CA)return;
+  Promise.all([
+    sb.from('retards').select('montant,date_paiement,motif,membre_id').eq('association_id',CA.id).eq('statut','paye'),
+    sb.from('amendes').select('montant,date_paiement,motif,membre_id').eq('association_id',CA.id).eq('statut','paye'),
+    sb.from('sorties_caisse').select('*').eq('association_id',CA.id),
+    sb.from('entrees_caisse').select('*').eq('association_id',CA.id)
+  ]).then(function(rs){
+    var rets=rs[0].data||[],ams=rs[1].data||[],sorties=rs[2].data||[],entrees=rs[3].data||[];
+    var totRet=rets.reduce(function(s,x){return s+(+x.montant);},0);
+    var totAm=ams.reduce(function(s,x){return s+(+x.montant);},0);
+    var totEntrees=entrees.reduce(function(s,x){return s+(+x.montant);},0);
+    var totE=totRet+totAm+totEntrees;
+    var totS=sorties.reduce(function(s,x){return s+(+x.montant);},0);
+    var solde=totE-totS;
+    sH('fc-solde',
+      '<div class="stat-grid">'+
+      '<div class="stat-card green"><div class="stat-label">Retards perçus</div><div class="stat-val">'+fmt(totRet)+' EUR</div></div>'+
+      '<div class="stat-card green"><div class="stat-label">Amendes perçues</div><div class="stat-val">'+fmt(totAm)+' EUR</div></div>'+
+      (totEntrees?'<div class="stat-card green"><div class="stat-label">Remb. prêts caisse</div><div class="stat-val">'+fmt(totEntrees)+' EUR</div></div>':'')+
+      '<div class="stat-card red"><div class="stat-label">Sorties manuelles</div><div class="stat-val">'+fmt(totS)+' EUR</div></div>'+
+      '<div class="stat-card yellow"><div class="stat-label">Solde fond caisse</div><div class="stat-val">'+fmt(solde)+' EUR</div></div>'+
+      '</div>'
+    );
+    var journal=[];
+    rets.forEach(function(x){journal.push({date:x.date_paiement,type:'Retard',mid:x.membre_id,desc:x.motif||'Retard payé',e:+x.montant,s:0});});
+    ams.forEach(function(x){journal.push({date:x.date_paiement,type:'Amende',mid:x.membre_id,desc:x.motif||'Amende payée',e:+x.montant,s:0});});
+    entrees.forEach(function(x){journal.push({date:x.date_entree,type:'Remb. prêt',mid:null,desc:x.motif||'Remboursement',e:+x.montant,s:0});});
+    sorties.forEach(function(x){journal.push({date:x.date_sortie,type:'Sortie',mid:null,desc:x.motif||'Sortie manuelle',e:0,s:+x.montant});});
+    journal.sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+    var h=journal.length?journal.map(function(x){
+      return '<tr><td>'+fdD(x.date)+'</td>'+
+        '<td><span class="badge '+(x.e>0?'badge-green':'badge-red')+'">'+x.type+'</span></td>'+
+        '<td>'+(x.mid?mChip(x.mid):'--')+'</td>'+
+        '<td>'+x.desc+'</td>'+
+        '<td style="color:var(--green)">'+(x.e?'+'+fmt(x.e)+' EUR':'')+'</td>'+
+        '<td style="color:var(--red)">'+(x.s?'-'+fmt(x.s)+' EUR':'')+'</td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucune opération</div></td></tr>';
+    sH('fc-tbody',h);
+  });
+}
+function addFC(){
+  var motif=gV('caisse-motif'),mt=+E('caisse-mt').value,dt=E('caisse-dt').value;
+  if(!mt){alert('Montant requis.');return;}
+  sb.from('sorties_caisse').insert({association_id:CA.id,motif:motif||null,montant:mt,date_sortie:dt}).then(function(){rFC();E('page-fond-caisse').querySelectorAll('.tab')[0].click();});
+}
+
+// ============================================================
+// FOND COTISATION
+// ============================================================
+function rFK(){
+  if(!CA)return;
+  Promise.all([
+    sb.from('cotisations').select('montant').eq('association_id',CA.id).eq('statut','paye'),
+    sb.from('virements_cotisation').select('*').eq('association_id',CA.id).order('date_virement',{ascending:false})
+  ]).then(function(rs){
+    var entrees=rs[0].data||[],virs=rs[1].data||[];
+    var totE=entrees.reduce(function(s,x){return s+(+x.montant);},0);
+    var totV=virs.reduce(function(s,x){return s+(+x.montant);},0);
+    var solde=totE-totV;
+    sH('fk-solde','<div class="stat-grid"><div class="stat-card green"><div class="stat-label">Cotisations</div><div class="stat-val">'+fmt(totE)+' EUR</div></div><div class="stat-card red"><div class="stat-label">Virements</div><div class="stat-val">'+fmt(totV)+' EUR</div></div><div class="stat-card yellow"><div class="stat-label">Solde</div><div class="stat-val">'+fmt(solde)+' EUR</div></div></div>');
+    var h=virs.length?virs.map(function(v){
+      return '<tr><td>'+fdD(v.date_virement)+'</td><td>'+mChip(v.membre_id)+'</td><td>'+(v.motif||'--')+'</td><td style="color:var(--red)">-'+fmt(v.montant)+' EUR</td></tr>';
+    }).join(''):'<tr><td colspan="4"><div class="empty">Aucun virement</div></td></tr>';
+    sH('fk-tbody',h);
+  });
+}
+function addVir(){
+  var mid=gV('vir-membre'),mt=+E('vir-mt').value,dt=E('vir-dt').value;
+  if(!mid||!mt){alert('Membre et montant requis.');return;}
+  sb.from('virements_cotisation').insert({association_id:CA.id,membre_id:mid,montant:mt,date_virement:dt,motif:gV('vir-motif')||null}).then(function(){rFK();E('page-fond-cotisation').querySelectorAll('.tab')[0].click();});
+}
+
+// ============================================================
+// REUNIONS
+// ============================================================
+function mRetard(heure){
+  if(!CA||!heure)return 0;
+  var h=CA.heure_reunion||'18:00';
+  var t1=CA.tranche1_max||'18:30',t2=CA.tranche2_max||'19:00';
+  var m1=+(CA.tranche1_montant||2.5),m2=+(CA.tranche2_montant||5);
+  if(heure<=h)return 0;
+  if(heure<=t1)return m1;
+  if(heure<=t2)return m2;
+  return m2;
+}
+function pReun(){
+  if(!MC.length)return;
+  var z=E('reun-presences');if(!z)return;
+  z.innerHTML=MC.filter(function(m){return m.statut==='actif';}).map(function(m){
+    return '<label style="display:flex;align-items:center;gap:8px;background:var(--bg3);border-radius:8px;padding:8px;cursor:pointer">'+
+      '<input type="checkbox" id="rp-'+m.id+'" value="'+m.id+'" onchange="upRP(\''+m.id+'\')"> '+
+      avEl(m.id)+' <span style="font-size:13px">'+m.prenom+' '+m.nom+'</span>'+
+      '<span id="rp-ret-'+m.id+'" style="margin-left:auto;font-size:11px;color:var(--text3)"></span></label>';
+  }).join('');
+}
+function upRP(mid){
+  var cb=E('rp-'+mid);if(!cb)return;
+  var z=E('reun-retards-zone');
+  if(cb.checked){
+    var inp=E('rp-h-'+mid);
+    if(!inp){
+      if(!z)return;
+      var div=document.createElement('div');
+      div.id='rp-hzone-'+mid;
+      div.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;';
+      div.innerHTML=avEl(mid)+'<span>'+mNm(mid)+'</span><input type="time" id="rp-h-'+mid+'" style="width:120px" oninput="chkRet(\''+mid+'\')">';
+      z.appendChild(div);
+    }
+  } else{
+    var hz=E('rp-hzone-'+mid);if(hz)hz.remove();
+    var rs=E('rp-ret-'+mid);if(rs)rs.textContent='';
+  }
+}
+function chkRet(mid){
+  var h=E('rp-h-'+mid);if(!h)return;
+  var r=mRetard(h.value);
+  var rs=E('rp-ret-'+mid);
+  if(rs)rs.textContent=r?'Retard: '+fmt(r)+' EUR':'';
+}
+function saveReun(){
+  var titre=gV('reun-titre'),date=E('reun-dt').value;
+  if(!titre||!date){alert('Titre et date requis.');return;}
+  var presents=[],absents=[],retardsList=[];
+  MC.filter(function(m){return m.statut==='actif';}).forEach(function(m){
+    var cb=E('rp-'+m.id);
+    if(cb&&cb.checked){
+      presents.push(m.id);
+      var h=E('rp-h-'+m.id);
+      var heure=h?h.value:'';
+      var r=mRetard(heure);
+      if(r>0)retardsList.push({membreId:m.id,heure:heure,montant:r});
+    } else{absents.push(m.id);}
+  });
+  sb.from('reunions').insert({association_id:CA.id,titre:titre,date_reunion:date,presents:presents,absents:absents}).select().single().then(function(r){
+    if(r.error){alert('Erreur: '+r.error.message);return;}
+    var rId=r.data.id;
+    var ps=[];
+    if(retardsList.length){
+      ps.push(sb.from('retards').insert(retardsList.map(function(x){return{association_id:CA.id,membre_id:x.membreId,motif:'Retard réunion: '+titre+' ('+x.heure+')',montant:x.montant,date_infraction:date,statut:'impaye',source:'reunion',reunion_id:rId};})));
+    }
+    Promise.all(ps).then(function(){
+      E('reun-titre').value='';pReun();
+      rReuns();E('page-reunions').querySelectorAll('.tab')[0].click();
+    });
+  });
+}
+function rReuns(){
+  if(!CA)return;
+  sb.from('reunions').select('*').eq('association_id',CA.id).order('date_reunion',{ascending:false}).then(function(r){
+    var data=r.data||[];
+    var h=data.length?data.map(function(x){
+      return '<tr><td>'+x.titre+'</td><td>'+fdD(x.date_reunion)+'</td><td>'+(x.presents||[]).length+'</td><td>'+(x.absents||[]).length+'</td><td>0</td>'+
+        '<td><button class="btn-s btn-sm" onclick="detReun(\''+x.id+'\')">Détail</button></td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucune réunion</div></td></tr>';
+    sH('reun-tbody',h);
+  });
+}
+function detReun(id){
+  sb.from('reunions').select('*').eq('id',id).single().then(function(r){
+    if(!r.data)return;
+    var x=r.data;
+    E('reun-det-titre').textContent=x.titre+' — '+fdD(x.date_reunion);
+    var presH=(x.presents||[]).map(function(mid){return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0">'+avEl(mid)+mNm(mid)+'</div>';}).join('');
+    var absH=(x.absents||[]).map(function(mid){return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0">'+avEl(mid)+mNm(mid)+'</div>';}).join('');
+    sH('reun-det-content',
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'+
+      '<div><div style="font-size:12px;color:var(--green);font-weight:600;margin-bottom:8px">PRÉSENTS ('+((x.presents||[]).length)+')</div>'+(presH||'<div class="empty">Aucun</div>')+'</div>'+
+      '<div><div style="font-size:12px;color:var(--red);font-weight:600;margin-bottom:8px">ABSENTS ('+((x.absents||[]).length)+')</div>'+(absH||'<div class="empty">Aucun</div>')+'</div></div>'
+    );
+    openMO('modal-reun');
+  });
+}
+
+// ============================================================
+// COMPTABILITE
+// ============================================================
+function initCompta(){
+  var sel=E('compta-annee');if(!sel)return;
+  var yr=new Date().getFullYear();
+  sel.innerHTML='';
+  for(var y=yr;y>=yr-5;y--){var o=document.createElement('option');o.value=y;o.textContent=y;sel.appendChild(o);}
+  rCompta();
+}
+function rCompta(){
+  if(!CA)return;
+  var yr=E('compta-annee')?E('compta-annee').value:new Date().getFullYear();
+  var s=yr+'-01-01',e=yr+'-12-31';
+  Promise.all([
+    sb.from('cotisations').select('*').eq('association_id',CA.id).gte('mois',yr+'-01').lte('mois',yr+'-12'),
+    sb.from('retards').select('*').eq('association_id',CA.id).gte('date_infraction',s).lte('date_infraction',e),
+    sb.from('amendes').select('*').eq('association_id',CA.id).gte('date_infraction',s).lte('date_infraction',e),
+    sb.from('dons').select('*').eq('association_id',CA.id).gte('date_don',s).lte('date_don',e),
+    sb.from('prets').select('*').eq('association_id',CA.id).gte('date_pret',s).lte('date_pret',e),
+    sb.from('sorties_caisse').select('*').eq('association_id',CA.id).gte('date_sortie',s).lte('date_sortie',e),
+    sb.from('virements_cotisation').select('*').eq('association_id',CA.id).gte('date_virement',s).lte('date_virement',e),
+    sb.from('adhesions').select('*').eq('association_id',CA.id).gte('date_paiement',s).lte('date_paiement',e)
+  ]).then(function(rs){
+    var entries=[];
+    function push(data,type,dateKey,midKey,descFn,isEntree){
+      (data||[]).forEach(function(x){entries.push({date:x[dateKey],type:type,mid:x[midKey],desc:descFn(x),e:isEntree?(+x.montant):0,s:isEntree?0:(+x.montant)});});
+    }
+    push(rs[0].data,'Cotisation','mois','membre_id',function(x){return 'Cotisation '+x.mois+' ('+x.statut+')';},true);
+    push(rs[1].data,'Retard','date_infraction','membre_id',function(x){return x.motif||'Retard';},true);
+    push(rs[2].data,'Amende','date_infraction','membre_id',function(x){return x.motif||'Amende';},true);
+    push(rs[3].data,'Don','date_don','beneficiaire_id',function(x){return x.motif||'Don accordé';},false);
+    push(rs[4].data,'Prêt','date_pret','beneficiaire_id',function(x){return x.motif||'Prêt accordé';},false);
+    push(rs[5].data,'Sortie caisse','date_sortie',null,function(x){return x.motif||'Sortie caisse';},false);
+    push(rs[6].data,'Virement','date_virement','membre_id',function(x){return x.motif||'Virement cotisation';},false);
+    push(rs[7].data,'Adhésion','date_paiement','membre_id',function(x){return 'Adhésion '+x.annee;},true);
+    entries.sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+    var totE=entries.reduce(function(s,x){return s+x.e;},0);
+    var totS=entries.reduce(function(s,x){return s+x.s;},0);
+    sH('compta-stats',
+      '<div class="stat-card green"><div class="stat-label">Total entrées</div><div class="stat-val">'+fmt(totE)+' EUR</div></div>'+
+      '<div class="stat-card red"><div class="stat-label">Total sorties</div><div class="stat-val">'+fmt(totS)+' EUR</div></div>'+
+      '<div class="stat-card yellow"><div class="stat-label">Solde</div><div class="stat-val">'+fmt(totE-totS)+' EUR</div></div>'
+    );
+    var h=entries.length?entries.map(function(x){
+      return '<tr><td>'+fdD(x.date)+'</td><td><span class="badge badge-gray">'+x.type+'</span></td><td>'+(x.mid?mChip(x.mid):'--')+'</td><td>'+(x.desc||'--')+'</td>'+
+        '<td style="color:var(--green)">'+(x.e?'+'+fmt(x.e)+' EUR':'')+'</td>'+
+        '<td style="color:var(--red)">'+(x.s?'-'+fmt(x.s)+' EUR':'')+'</td></tr>';
+    }).join(''):'<tr><td colspan="6"><div class="empty">Aucune opération</div></td></tr>';
+    sH('compta-tbody',h);
+  });
+}
+function exportCSV(){
+  var rows=document.querySelectorAll('#compta-tbody tr');
+  var csv='Date,Type,Membre,Description,Entrée,Sortie\n';
+  rows.forEach(function(r){
+    var cells=r.querySelectorAll('td');
+    if(cells.length<6)return;
+    csv+='"'+cells[0].textContent+'","'+cells[1].textContent+'","'+cells[2].textContent+'","'+cells[3].textContent+'","'+cells[4].textContent+'","'+cells[5].textContent+'"\n';
+  });
+  var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='compta-mboa.csv';a.click();
+}
+
+// ============================================================
+// ALERTES
+// ============================================================
+function rAlertes(){
+  if(!CA)return;
+  var t=td();
+  Promise.all([
+    sb.from('retards').select('*').eq('association_id',CA.id).eq('statut','impaye'),
+    sb.from('amendes').select('*').eq('association_id',CA.id).eq('statut','impaye'),
+    sb.from('remboursements').select('*').eq('association_id',CA.id).eq('statut','en attente').lt('echeance',t)
+  ]).then(function(rs){
+    var rets=rs[0].data||[],ams=rs[1].data||[],rembs=rs[2].data||[];
+    var total=rets.length+ams.length+rembs.length;
+    var badge=E('badge-alertes');
+    if(badge){badge.style.display=total?'inline':'none';badge.textContent=total;}
+    var h='';
+    if(rets.length)h+='<div class="card"><div class="card-title" style="color:var(--red)">⏰ Retards impayés ('+rets.length+')</div>'+rets.map(function(x){return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">'+mChip(x.membre_id)+'<span style="font-weight:500;color:var(--red)">'+fmt(x.montant)+' EUR</span></div>';}).join('')+'</div>';
+    if(ams.length)h+='<div class="card"><div class="card-title" style="color:var(--red)">⚠️ Amendes impayées ('+ams.length+')</div>'+ams.map(function(x){return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">'+mChip(x.membre_id)+'<span style="font-weight:500;color:var(--red)">'+fmt(x.montant)+' EUR</span></div>';}).join('')+'</div>';
+    if(rembs.length)h+='<div class="card"><div class="card-title" style="color:var(--accent)">🔄 Remboursements en retard ('+rembs.length+')</div>'+rembs.map(function(x){return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">'+mChip(x.membre_id)+'<div style="text-align:right"><div style="font-weight:500;color:var(--accent)">'+fmt(x.montant)+' EUR</div><div style="font-size:11px;color:var(--text3)">Éch. '+fdD(x.echeance)+'</div></div></div>';}).join('')+'</div>';
+    if(!h)h='<div class="alert alert-success">✅ Aucune alerte — tout est à jour !</div>';
+    sH('alertes-content',h);
+  });
+}
+
+// ============================================================
+// MON COMPTE
+// ============================================================
+function rMC(){
+  var id=gV('mc-select');if(!id){sH('mc-content','');return;}
+  var t=td(),deb=debut();
+  Promise.all([
+    sb.from('cotisations').select('*').eq('association_id',CA.id).eq('membre_id',id).order('mois',{ascending:false}),
+    sb.from('retards').select('*').eq('association_id',CA.id).eq('membre_id',id),
+    sb.from('amendes').select('*').eq('association_id',CA.id).eq('membre_id',id),
+    sb.from('remboursements').select('*').eq('association_id',CA.id).eq('membre_id',id).eq('statut','en attente'),
+    sb.from('reunions').select('*').eq('association_id',CA.id).gte('date_reunion',deb)
+  ]).then(function(rs){
+    var cots=rs[0].data||[],rets=rs[1].data||[],ams=rs[2].data||[],rembs=rs[3].data||[],reuns=rs[4].data||[];
+    var totC=cots.filter(function(c){return c.statut==='paye';}).reduce(function(s,c){return s+(+c.montant);},0);
+    var retImp=rets.filter(function(x){return x.statut==='impaye';}).reduce(function(s,x){return s+(+x.montant);},0);
+    var amImp=ams.filter(function(x){return x.statut==='impaye';}).reduce(function(s,x){return s+(+x.montant);},0);
+    var nbP=reuns.filter(function(r){return (r.presents||[]).indexOf(id)>=0;}).length;
+    var pct=reuns.length?Math.round(nbP/reuns.length*100):100;
+    var pctC=pct>=80?'var(--green)':pct>=50?'var(--accent)':'var(--red)';
+    sH('mc-content',
+      '<div class="stat-grid">'+
+      '<div class="stat-card green"><div class="stat-label">Cotisations payées</div><div class="stat-val">'+fmt(totC)+' EUR</div></div>'+
+      '<div class="stat-card blue"><div class="stat-label">Fond adhésion</div><div class="stat-val">'+fmt(FC[id]||0)+' EUR</div></div>'+
+      '<div class="stat-card red"><div class="stat-label">Retards dus</div><div class="stat-val">'+fmt(retImp)+' EUR</div></div>'+
+      '<div class="stat-card red"><div class="stat-label">Amendes dues</div><div class="stat-val">'+fmt(amImp)+' EUR</div></div>'+
+      '<div class="stat-card yellow"><div class="stat-label">Remb. en attente</div><div class="stat-val">'+rembs.length+'</div></div>'+
+      '<div class="stat-card" style="border-color:'+pctC+'"><div class="stat-label">Présence réunions</div><div class="stat-val" style="color:'+pctC+'">'+pct+'%</div><div class="stat-sub">'+nbP+'/'+reuns.length+' cette saison</div></div>'+
+      '</div>'+
+      '<div class="card"><div class="card-title">Cotisations récentes</div>'+
+      (cots.slice(0,6).map(function(c){return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span>'+(c.mois||'--')+'</span><div style="display:flex;gap:8px"><span>'+fmt(c.montant)+' EUR</span><span class="badge '+(c.statut==='paye'?'badge-green':'badge-red')+'">'+(c.statut==='paye'?'Payé':'Impayé')+'</span></div></div>';}).join('')||'<div class="empty">Aucune cotisation</div>')+
+      '</div>'
+    );
+  });
+}
+
+// ============================================================
+// CONFIGURATION
+// ============================================================
+function loadConf(){
+  if(!CA)return;
+  applyConf();
+  var plan=(CA&&CA.plan)||'gratuit';
+  sH('cf-plan',plan==='gratuit'?'<div class="alert alert-warning">Plan gratuit — Limité à 10 membres.</div>':'<div class="alert alert-success">Plan '+plan+' actif</div>');
+}
+function saveConf(){
+  if(!CA)return;
+  var col=gV('cf-col-hex');
+  var up={nom:gV('cf-nom'),couleur_accent:col,heure_reunion:E('cf-heure').value,tranche1_max:E('cf-t1').value,tranche1_montant:+E('cf-m1').value,tranche2_max:E('cf-t2').value,tranche2_montant:+E('cf-m2').value,montant_amende_absence:+E('cf-am').value,nb_absences_avant_amende:+E('cf-nba').value,mois_reset:+E('cf-mr').value,duree_remboursement_mois:+E('cf-dr').value};
+  sb.from('associations').update(up).eq('id',CA.id).then(function(r){
+    var msg=E('cf-msg');
+    if(r.error){msg.className='alert alert-error';msg.textContent='Erreur: '+r.error.message;}
+    else{Object.assign(CA,up);if(E('sb-nom'))E('sb-nom').textContent=up.nom||'Mboa';if(col)document.documentElement.style.setProperty('--accent',col);msg.className='alert alert-success';msg.textContent='Configuration sauvegardée !';}
+    msg.classList.remove('hidden');setTimeout(function(){msg.classList.add('hidden');},3000);
+  });
+}
+function exportData(){
+  if(!CA)return;
+  var aid=CA.id;
+  var tables=['membres','cotisations','adhesions','retards','amendes','reunions','dons','prets','remboursements','sorties_caisse','virements_cotisation','fonds_adhesion','prets_interets'];
+  var result={association:CA,_date:new Date().toISOString()};
+  var ps=tables.map(function(tb){return sb.from(tb).select('*').eq('association_id',aid).then(function(r){result[tb]=r.data||[];});});
+  Promise.all(ps).then(function(){var a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(result,null,2));a.download='mboa-export.json';a.click();});
+}
+
+// ============================================================
+// SUPER ADMIN
+// ============================================================
+function rSuperAdmin(){
+  if(!IS_SUPER){navTo('dashboard');return;}
+  Promise.all([
+    sb.from('associations').select('*'),
+    sb.from('utilisateurs').select('id,prenom,nom,email,role,association_id,associations(nom)')
+  ]).then(function(rs){
+    var assos=rs[0].data||[],users=rs[1].data||[];
+    var h=
+      // ASSOCIATIONS
+      '<div class="card"><div class="card-title" style="color:var(--accent)">Associations ('+assos.length+')</div>'+
+      '<div class="table-wrap"><table><thead><tr><th>Nom</th><th>Plan</th><th>Statut</th><th>Max membres</th><th>ID</th><th>Actions</th></tr></thead><tbody>'+
+      assos.map(function(a){
+        var planBadge=a.plan==='premium'?'badge-green':a.plan==='pro'?'badge-blue':'badge-yellow';
+        var statutBadge=a.statut==='suspendu'?'badge-red':'badge-green';
+        return '<tr>'+
+          '<td><strong>'+a.nom+'</strong></td>'+
+          '<td><span class="badge '+planBadge+'">'+(a.plan||'gratuit')+'</span></td>'+
+          '<td><span class="badge '+statutBadge+'">'+(a.statut||'actif')+'</span></td>'+
+          '<td style="text-align:center">'+(a.max_membres?a.max_membres:'∞')+'</td>'+
+          '<td style="font-size:10px;color:var(--text3)">'+a.id+'</td>'+
+          '<td style="display:flex;gap:4px;flex-wrap:wrap">'+
+            '<button class="btn-s btn-sm" onclick="saPlan(\''+a.id+'\',\''+(a.plan||'gratuit')+'\')">Plan</button>'+
+            '<button class="btn-s btn-sm" onclick="saMaxMembres(\''+a.id+'\','+(a.max_membres||0)+')">Membres</button>'+
+            '<button class="btn-s btn-sm" onclick="saStatut(\''+a.id+'\',\''+(a.statut||'actif')+'\')">Statut</button>'+
+            '<button class="btn-d btn-sm" onclick="saReset(\''+a.id+'\',\''+a.nom+'\')">Reset</button>'+
+          '</td>'+
+        '</tr>';
+      }).join('')+
+      '</tbody></table></div></div>'+
+      // UTILISATEURS
+      '<div class="card"><div class="card-title" style="color:var(--accent)">Utilisateurs ('+users.length+')</div>'+
+      '<div class="table-wrap"><table><thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Association</th><th>Actions</th></tr></thead><tbody>'+
+      users.map(function(u){
+        var roleBadge=u.role==='superadmin'?'badge-yellow':u.role==='admin'?'badge-blue':'badge-gray';
+        return '<tr>'+
+          '<td>'+((u.prenom||'')+' '+(u.nom||'')).trim()+'</td>'+
+          '<td style="font-size:12px">'+u.email+'</td>'+
+          '<td><span class="badge '+roleBadge+'">'+u.role+'</span></td>'+
+          '<td>'+((u.associations&&u.associations.nom)||'--')+'</td>'+
+          '<td><button class="btn-s btn-sm" onclick="saRole(\''+u.id+'\',\''+u.role+'\')">Chg. rôle</button></td>'+
+        '</tr>';
+      }).join('')+
+      '</tbody></table></div></div>';
+    sH('sa-content',h);
+  });
+}
+function saPlan(assoId,current){
+  var plans=['gratuit','pro','premium'];
+  var newPlan=prompt('Nouveau plan (gratuit / pro / premium):',current);
+  if(!newPlan||!plans.includes(newPlan))return;
+  sb.from('associations').update({plan:newPlan}).eq('id',assoId).then(function(r){
+    if(r.error){alert('Erreur: '+r.error.message);return;}
+    alert('Plan mis à jour: '+newPlan);rSuperAdmin();
+  });
+}
+function saMaxMembres(assoId,current){
+  var nb=prompt('Nombre maximum de membres (0 = illimité):',current||0);
+  if(nb===null)return;
+  nb=parseInt(nb);
+  if(isNaN(nb)||nb<0){alert('Nombre invalide.');return;}
+  sb.from('associations').update({max_membres:nb}).eq('id',assoId).then(function(r){
+    if(r.error){alert('Erreur: '+r.error.message);return;}
+    alert('Limite membres mise à jour: '+(nb===0?'Illimité':nb));rSuperAdmin();
+  });
+}
+function saStatut(assoId,current){
+  var newStatut=current==='actif'?'suspendu':'actif';
+  if(!confirm('Passer le statut à "'+newStatut+'" ?'))return;
+  sb.from('associations').update({statut:newStatut}).eq('id',assoId).then(function(r){
+    if(r.error){alert('Erreur: '+r.error.message);return;}
+    alert('Statut mis à jour: '+newStatut);rSuperAdmin();
+  });
+}
+function saReset(assoId,assoNom){
+  if(!confirm('⚠️ ATTENTION: Réinitialiser TOUTES les données de "'+assoNom+'" ?\n\nCeci supprimera membres, cotisations, réunions, dons, prêts, etc.\n\nCette action est IRRÉVERSIBLE.'))return;
+  if(!confirm('Dernière confirmation: supprimer toutes les données de "'+assoNom+'" ?'))return;
+  var tables=['remboursements','cotisations','adhesions','retards','amendes','reunions','dons','prets','prets_interets','sorties_caisse','virements_cotisation','fonds_adhesion','membres'];
+  var ps=tables.map(function(tb){return sb.from(tb).delete().eq('association_id',assoId);});
+  Promise.all(ps).then(function(){alert('Données réinitialisées pour '+assoNom);rSuperAdmin();});
+}
+function saRole(userId,currentRole){
+  var newRole=prompt('Nouveau rôle (admin / membre / superadmin):',currentRole);
+  if(!newRole||!['admin','membre','superadmin'].includes(newRole))return;
+  sb.from('utilisateurs').update({role:newRole}).eq('id',userId).then(function(){rSuperAdmin();});
+}
+</script>
+</body>
+</html>
